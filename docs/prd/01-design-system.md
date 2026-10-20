@@ -26,7 +26,7 @@ Give every storefront page one coherent visual language (objective O1) and one s
 
 **Non-goals**
 
-- Restyling the admin `(admin)` or profile `(profile)` panels. They must keep working with their existing tokens (§9.3, R12).
+- Restyling the admin `(admin)` or profile `(profile)` panels. They must keep working with their existing tokens (§9.3, R12). The P1 Telegram "sign-in methods" card added to the profile panel (FR-TG-07, sub-PRD 09) uses that panel's existing styles and is not a restyle.
 - Adding any animation, 3D, or UI-kit library in P0.
 
 ## 3. Current state (summary)

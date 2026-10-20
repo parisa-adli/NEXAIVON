@@ -2,7 +2,7 @@
 
 |                |                                                                     |
 | -------------- | ------------------------------------------------------------------- |
-| **Parent**     | [PRD](../PRD.md) §11.3, FR-API-10, 12, 13, 14, FR-PDP-08, FR-PDP-15, FR-CART-07, AC-VAR-01 |
+| **Parent**     | [PRD](../PRD.md) §11.3, FR-API-10, 12, 13, 14, FR-PDP-08, FR-PDP-15, FR-CART-07, AC-VAR-01, R18, R20 |
 | **Priority**   | P2 (optional). None of these items is required for release           |
 | **Repos**      | `client/` and `server/`                                             |
 | **Depends on** | 07 (FR-API-16 for sales counts), 10 (data-model patterns)          |
@@ -50,7 +50,21 @@ Record the deferred items with their prerequisites, so they aren't lost and aren
 
 - No data basis today.
 
-### 2.8 Cleanups (low risk; may be pulled earlier)
+### 2.8 Telegram follow-ups
+
+The P1 Telegram flow is in sub-PRD 09 (Q20–Q22). These items were deliberately left out:
+
+- **Admin unlink.** The reference has `DELETE /users/:id/credentials/telegram` for admins. NEXAIVON's admin panel is preserve-only, so this waits.
+- **Add a verified phone to a Telegram-only account.** Needs a phone OTP step bound to the signed-in user. It depends on 2.9.
+- **Account merge.** Combining a phone account and a Telegram account (cart, wishlist, orders) needs both owners proven at once. Today the user links Telegram from the phone account instead (FR-TG-07, R20).
+- **Webhook-only hosting.** Polling is the default. Webhook mode is specified (FR-API-19), but production use waits on the hosting decision (R17).
+
+### 2.9 Verified phone change and unique phone numbers (R18)
+
+- `PATCH /user/update` accepts `phoneNumber` without an OTP, and `phoneNumber` has no unique index. `getOtp` and `checkOtp` look users up by `findOne({ phoneNumber })`, so two accounts with one number can match the wrong account.
+- Proposed: require an OTP to change the number, add a unique sparse index after checking existing data for duplicates, and rate-limit `get-otp` the way FR-API-21 limits the Telegram routes.
+
+### 2.10 Cleanups (low risk; may be pulled earlier)
 
 - Remove the duplicate `likedProducts` declaration in the User model (PRD §9.1).
 
@@ -61,3 +75,4 @@ Record the deferred items with their prerequisites, so they aren't lost and aren
 | #   | Decision                                                   |
 | --- | ---------------------------------------------------------- |
 | Q15 | Variants aren't needed now. Each variant is a separate product. |
+| Q22 | Telegram link and unlink are in the profile (09). Admin unlink and merge stay here. |

@@ -21,7 +21,7 @@ This folder decomposes the parent [PRD](../PRD.md) into independently plannable 
 | 06  | [Product detail page](06-product-detail.md)                                | P0 / P1  | client           | 01, 03, 07, 08 |
 | 07  | [Cart, checkout, and stock correctness](07-cart-checkout.md)               | P0 / P1  | client + server  | 01             |
 | 08  | [Wishlist](08-wishlist.md)                                                 | P0 / P1  | client + server  | 01             |
-| 09  | [Authentication: return-to and restyle](09-auth.md)                        | P0 / P1  | client           | 01             |
+| 09  | [Authentication: return-to, restyle, and Telegram login](09-auth.md)       | P0 / P1  | client + server  | 01, 11 (test harness) |
 | 10  | [Catalogue data extensions: gallery, specs, category images](10-catalogue-data-extensions.md) | P1 | server + admin + client | 03, 06 |
 | 11  | [Quality: seed data, tests, accessibility, performance](11-quality.md)     | P0       | client + server  | spans all      |
 | 12  | [Future backlog (P2)](12-future-backlog.md)                                | P2       | client + server  | 07, 10         |
@@ -44,6 +44,7 @@ Phase B (storefront P0)
 Phase C (P1)
   03 search/sort/pagination ──► 05 P1      10 gallery/specs/category images ──► 06 P1, 04
   07 set-quantity ──► 06 quantity selector  08 wishlist page   09 return-to
+  09 Telegram: model → bot → endpoints + rate limits (BE) ──► auth tab, profile card (FE)
                                 ▼
 Phase D: 11 full regression + Lighthouse/axe sign-off, then 12 as needed
 ```
@@ -71,6 +72,8 @@ Because `client/` and `server/` deploy independently (R16), every server change 
 | P0-15 Server image upload          | 03, 10     |
 | P0-16 Server-computed `offPrice`   | 07         |
 
+Parent P1 items with a dedicated home: Telegram login (PRD §6.6.1, §8.6) → 09; its tests → 11.
+
 ## Decisions
 
 All open questions were resolved with the project owner on 2026-10-20. The full decision table is in [PRD §15.1](../PRD.md). Each sub-PRD lists the decisions that affect it.
@@ -86,4 +89,6 @@ All open questions were resolved with the project owner on 2026-10-20. The full 
 | Q8       | 07, 06     | Q17      | 11         |
 | Q9       | 06         | Q18      | 09         |
 | Q10      | 07         | Q19      | 11, 04     |
-| Dev OTP  | 09, 11     |          |            |
+| Dev OTP  | 09, 11     | Q20      | 09         |
+| Q21      | 09, 11     | Q22      | 09, 12     |
+| Q23      | 09         | Q24      | 09, 11     |

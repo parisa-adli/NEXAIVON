@@ -64,7 +64,7 @@ The upgrade must stay practical: accessible, responsive, fast, RTL-correct, and 
 | User                   | Description                                   | Current support                                                                                                                                                       |
 | ---------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Guest shopper**      | Persian-speaking visitor browsing electronics | Can browse the homepage, listing, and product pages. Cannot add to cart (redirected to `/auth`). **[Verified]** `client/src/app/(user)/products/[slug]/AddToCart.jsx` |
-| **Signed-in shopper**  | Logged in via phone OTP                       | Server-side cart, likes ("wishlist"), coupons, order placement, profile. **[Verified]**                                                                               |
+| **Signed-in shopper**  | Logged in via phone OTP (Telegram login is **[Proposed]**, §6.6.1) | Server-side cart, likes ("wishlist"), coupons, order placement, profile. **[Verified]**                                                                               |
 | **Admin**              | User with `role === "ADMIN"`                  | Admin panel at `/admin` for products, categories, coupons, users, payments. **Out of scope to redesign; must be preserved.** **[Verified]**                           |
 | **Portfolio reviewer** | Recruiter or engineer evaluating the project  | Not a system role. Drives the quality bar for design, accessibility, and code. **[Assumption]**                                                                       |
 
@@ -74,6 +74,8 @@ The upgrade must stay practical: accessible, responsive, fast, RTL-correct, and 
 2. **Search (any user):** Header search → results listing → product page. Search UI is **[Proposed]**. The backend `search` parameter exists but its index is **[Unverified]** (§8.3).
 3. **Wishlist (signed in):** Toggle the heart on a card or product page → the state persists across pages. A "My wishlist" page is **[Proposed]**.
 4. **Checkout (signed in):** Cart → adjust quantity → apply coupon → "Place order". The flow is preserved. Correctness fixes are **[Proposed]** (§8.2).
+5. **Sign in with Telegram (any visitor):** `/auth` → "ورود با تلگرام" tab → scan the QR code (desktop) or tap "Open Telegram" (mobile) → press Start in the NEXAIVON bot → type the 6-digit code the bot sends → signed in. A new Telegram account goes through `/complete-profile` first. The `next` return-to applies as in journey 1. **[Proposed, P1]** (§6.6.1).
+6. **Link Telegram (signed in):** Profile → "روش‌های ورود" (sign-in methods) → "Link Telegram" → same QR and code steps → Telegram is added as a second sign-in method. **[Proposed, P1]** (FR-TG-07).
 
 ---
 
@@ -85,11 +87,13 @@ The upgrade must stay practical: accessible, responsive, fast, RTL-correct, and 
 - A design-system refresh: tokens, typography, reusable UI components.
 - Backend changes **only where a storefront requirement depends on them**, each documented in §8.
 - Correctness fixes to price and stock handling that the storefront relies on.
+- **Telegram login (P1, decided Q20–Q22):** sign-in and sign-up through a Telegram bot, plus linking and unlinking Telegram from the profile panel (§6.6.1, §8.6). It is added **alongside** phone OTP. The reference implementation is the Telegram auth flow of the `parisa-adli/-inventory-app-ai` repository (§6.6.1, "Reference").
 
 ### 3.2 Non-goals
 
-- Redesigning the **admin panel** `(admin)` or **profile panel** `(profile)`. They must keep working and may inherit tokens, but they get no new layout work. Minimal admin form additions needed to _enter_ new product data (for example multiple images) are listed as dependencies, not as redesigns.
-- Replacing **authentication** (phone OTP via Kavenegar plus JWT cookies).
+- Redesigning the **admin panel** `(admin)` or **profile panel** `(profile)`. They must keep working and may inherit tokens, but they get no new layout work. Minimal admin form additions needed to _enter_ new product data (for example multiple images) are listed as dependencies, not as redesigns. The one profile addition is the "sign-in methods" card for Telegram linking (FR-TG-07), which is a minimal addition, not a redesign.
+- Replacing **authentication**. Phone OTP via Kavenegar stays the default sign-in method, and the JWT cookie session (`accessToken` / `refreshToken`) is unchanged. Telegram login (§6.6.1) is an **additional** way to obtain the same session; it does not replace or modify the existing one.
+- Password sign-in, email verification, and email delivery. The reference repository has them; NEXAIVON does not, and they are not added (§6.6.1, "Adaptations").
 - Integrating a **real payment gateway**. The current "payment" records an order as paid without a gateway (§4.4). **Decided (Q10):** keep the simulated order and label it clearly as a demo order. No gateway is integrated in this project.
 - Changing the UI locale away from Persian/RTL.
 - Inventing business policies such as shipping times, returns, warranties, or store address (Q5: kept hidden).
@@ -507,7 +511,73 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 | **FR-AUTH-01** | Support `?next=<path>` on `/auth` (and through `/complete-profile`). Redirect there after success. Accept only same-origin relative paths starting with `/`. | Frontend only |
 | **FR-AUTH-02** | Restyle the auth and complete-profile screens to the new design system. Preserve the flow, the 90 s timer, and validation.                                   | Frontend only |
 | **FR-AUTH-03** | Accessible OTP input: one-time-code autocomplete, labelled, LTR digits within the RTL page.                                                                  | Frontend only |
-| —              | No changes to tokens, cookies, OTP provider, or roles.                                                                                                       | Non-goal      |
+| —              | No changes to the JWT cookies, the phone OTP provider, or roles. Telegram (§6.6.1) adds a second way to obtain the same session.                            | Non-goal      |
+
+### 6.6.1 Telegram login [Proposed, P1]
+
+**Decided (Q20–Q22):** Telegram login is **P1**. It supports both **sign-in and sign-up**, and signed-in users can **link and unlink** Telegram from the profile panel.
+
+**Reference.** The flow follows the Telegram auth implementation in `github.com/parisa-adli/-inventory-app-ai` (TypeScript, Express, Mongoose, grammY). I read these files: `server/src/services/telegramAuth.ts` (session state machine, code handling), `server/src/routes/telegramAuth.ts` (endpoints, session cookie), `server/src/services/telegram.ts` (bot, modes, deep link, webhook), `server/src/models/AuthSession.ts`, `server/src/services/telegramSignup.ts`, `server/src/services/signInMethods.ts` (unlink rule), `server/src/middleware/rateLimit.ts`, `client/src/features/auth/hooks/useTelegramAuth.ts`, `client/src/features/auth/components/TelegramSteps.tsx`, and `server/.env.example`. **[Verified in the reference repo]**. Nothing in NEXAIVON implements Telegram today. **[Verified]**
+
+**How the reference flow works.** The website shows a QR code. The person scans it and presses Start in the bot. The bot sends a one-time code in the chat. The person types that code on the website. The code proves that the person controls the Telegram account, and it ties the bot conversation to the browser session that showed the QR code.
+
+```
+Browser                         NEXAIVON API                          Telegram bot
+  │ POST /user/telegram/start ──► AuthSession PENDING
+  │ ◄── cookie telegramAuthSession + deepLink t.me/<bot>?start=<nonce>
+  │ shows QR + "Open Telegram"
+  │ GET /user/telegram/status (every 2 s) ...                          
+  │                               ◄── /start <nonce> ──────────────── user presses Start
+  │                               PENDING → AWAITING_OTP (atomic claim)
+  │                               ── 6-digit code ──────────────────► chat
+  │ status = AWAITING_OTP → code input
+  │ POST /user/telegram/verify {code} ──► known chat: LOGIN / new chat: SIGNUP / LINK
+  │ ◄── accessToken + refreshToken cookies (existing setAccessToken / setRefreshToken)
+  │ isActive = false → /complete-profile ; else → next or /
+```
+
+**Adaptations for NEXAIVON** (where the reference and NEXAIVON differ):
+
+| Reference behaviour                                                                                   | NEXAIVON behaviour **[Proposed]**                                                                                                                                                                                         | Why                                                                                       |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Routes under `/api/auth/telegram`; JSON `{status, user}`                                              | Routes under `/api/user/telegram/*`; the existing `{statusCode, data: {...}}` envelope with Persian messages                                                                                                             | Matches the existing `/user/*` auth routes and error handler (§4.3)                      |
+| TypeScript services, Zod env validation, Mongo-backed rate limiter                                    | CommonJS controller and service in the existing structure (`server/app/http/controllers/user/`, `server/app/models/`), Joi validation, in-memory `express-rate-limit`                                                  | Follows existing server conventions; no TypeScript in `server/`                           |
+| New Telegram account: a `AWAITING_PROFILE` step on the Telegram panel collects username + email, then an email verification link is sent | After the code, a **new user is created and signed in immediately** with `isActive = false`. They go through the existing `/complete-profile` page (name + email), exactly as a new phone user does. No `AWAITING_PROFILE` state | NEXAIVON already has a profile-completion step, and has no email service                  |
+| Email already belongs to an account: a "confirm this is you" link is emailed, then Telegram is linked | `/complete-profile` keeps rejecting a duplicate email (existing behaviour). The client adds a hint: sign in with the mobile number and link Telegram from the profile (FR-TG-07). No automatic merge                     | No email delivery; avoids merging accounts on an unproven email                           |
+| Password, staff roles, approval (`pending` / `rejected`) states                                       | Not applicable. Role stays `USER` for new accounts. `isActive` keeps its current meaning (profile completed)                                                                                                              | NEXAIVON has none of these                                                                |
+| Bot texts in English                                                                                  | Bot texts in Persian                                                                                                                                                                                                      | Persian storefront (A1)                                                                   |
+| Session lifetime from the reference: issued by `issueSession` (15 min access / 7 day refresh)         | Existing cookies and lifetimes (1 day / 1 year, signed, httpOnly, `SameSite=Lax`) via the existing `setAccessToken` / `setRefreshToken`                                                                                   | Telegram must produce exactly the same session as phone OTP                               |
+
+**Requirements**
+
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Type                 |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| **FR-TG-01** | `/auth` offers two methods as an accessible tab list: "ورود با شماره موبایل" (default, the current OTP flow) and "ورود با تلگرام". Switching tabs never loses the `next` parameter (FR-AUTH-01).                                                                                                                                                                                                                                                                                                                  | Frontend             |
+| **FR-TG-02** | Starting the Telegram tab calls `POST /user/telegram/start` once (guard against React StrictMode double effects). It shows a QR code of the returned `deepLink` and an "Open Telegram" link to the same URL (`target="_blank"`, `rel="noreferrer"`). Below 640 px the button is the primary action and the QR code is secondary. A countdown shows the remaining session time (5 min).                                                                                                                          | Frontend             |
+| **FR-TG-03** | While the QR step is shown, the client polls `GET /user/telegram/status` every 2 s. Polling stops when the status leaves `PENDING`, on expiry, and on unmount.                                                                                                                                                                                                                                                                                                                                                     | Frontend             |
+| **FR-TG-04** | When the status becomes `AWAITING_OTP`, the client shows a 6-digit code input with the same accessibility rules as FR-AUTH-03 (labelled, `inputmode="numeric"`, LTR digits). It shows the code countdown (2 min) and a "Resend code" control that is enabled after a 60 s cooldown, up to 3 resends.                                                                                                                                                                                                              | Frontend             |
+| **FR-TG-05** | `EXPIRED` and `LOCKED` show a clear Persian message and a "Start over" button that starts a fresh attempt. Wrong codes show the server message, including the attempts left. A `503` (Telegram not configured) shows "ورود با تلگرام در حال حاضر در دسترس نیست" and offers the phone tab.                                                                                                                                                                                                                       | Frontend             |
+| **FR-TG-06** | After a successful verify the client follows the **same post-login routing as phone OTP**: `isActive === false` → `/complete-profile` (carrying `next`), otherwise `next` or `/`. It invalidates `["get-user"]` so the header updates.                                                                                                                                                                                                                                                                         | Frontend             |
+| **FR-TG-07** | **Sign-in methods card** in the profile panel (`(profile)`): shows the mobile number (verified or not) and Telegram (`@username` when linked). "Link Telegram" runs the same QR → code steps through `POST /user/telegram/link`; the user stays signed in. "Unlink" calls `DELETE /user/telegram` behind a confirm dialog. This is a minimal addition, not a profile redesign.                                                                                                                                   | Frontend             |
+| **FR-TG-08** | `/complete-profile` prefills the name from the Telegram display name when the account was created through Telegram. On the duplicate-email error it shows a hint to sign in with the mobile number and link Telegram from the profile.                                                                                                                                                                                                                                                                          | Frontend             |
+| **FR-TG-09** | Surfaces that show `phoneNumber` (profile panel, admin user list, admin payment detail) render a missing number gracefully (for example "—") for Telegram-only accounts. **[Unverified: these pages were not inspected for null `phoneNumber` handling]**                                                                                                                                                                                                                                                        | Frontend (compat)    |
+| **FR-TG-10** | Server endpoints, bot, data model, and rate limits per §8.6 (FR-API-18..21).                                                                                                                                                                                                                                                                                                                                                                                                                                       | Backend              |
+| —            | The Telegram tab uses the neutral palette (Q3): the Telegram button is a charcoal primary button with the Telegram icon from `react-icons`, not Telegram blue.                                                                                                                                                                                                                                                                                                                                                              | Design rule          |
+
+**Acceptance criteria (Telegram)**
+
+- **AC-TG-01** Sign-in, linked account: QR → Start in the bot → correct code → the user is signed in with the same `accessToken` and `refreshToken` cookies as phone OTP, the `telegramAuthSession` cookie is cleared, and the user lands on `next` (or `/`).
+- **AC-TG-02** Sign-up, unknown Telegram account: after the correct code, exactly one new user exists with `telegramChatId`, `telegramUsername`, role `USER`, `isActive = false`, and no `phoneNumber`. The user is signed in and sent to `/complete-profile` with the name prefilled. After completing it, `isActive = true`.
+- **AC-TG-03** A nonce works once. A second Start on the same QR, or a Start after expiry (5 min), gets the "expired" bot reply and never overwrites the stored Telegram account.
+- **AC-TG-04** A wrong code returns 400 with the attempts left. The fifth wrong code locks the attempt (423), and further verifies fail until "Start over". A code older than 2 minutes returns 410.
+- **AC-TG-05** Resend is refused (429) within 60 s of the last code and after 3 resends. A resent code replaces the old one, and the old code no longer verifies.
+- **AC-TG-06** Two parallel verifies with the same correct code create at most one session and at most one user.
+- **AC-TG-07** Link: a phone user links Telegram from the profile and keeps their session; `telegramChatId` is now set. Linking a Telegram account that is already linked to another user returns 409 and changes nothing. A link attempt verified by a different signed-in user returns 403 and expires the attempt.
+- **AC-TG-08** Unlink: a user with a verified phone number can unlink Telegram. A Telegram-only user gets 400 ("Telegram is your only sign-in method") and nothing changes.
+- **AC-TG-09** Someone who only saw the QR code (has the nonce but not the browser cookie) cannot read the status, verify a code, or finish the attempt.
+- **AC-TG-10** With `NODE_ENV=production` and no `TELEGRAM_BOT_TOKEN`, every `/user/telegram/*` endpoint returns 503 with a Persian message, and phone OTP keeps working. Outside production with no token, bot messages (including codes) are written to the server log instead of being sent.
+- **AC-TG-11** Per-IP rate limits apply (FR-API-21). Exceeding one returns 429 in the standard envelope.
+- **AC-TG-12** The Telegram tab passes AC-A11Y-01 (axe) and is fully keyboard operable. The QR code has a text alternative, and the "Open Telegram" link is always available as a non-QR path.
 
 ---
 
@@ -563,6 +633,9 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 | Wishlist toggle                    | `POST /product/like/:id`                       | —                                                   | **Supported**                                        | —                                                                      |
 | Wishlist page                      | `GET /user/profile` (`likedProducts` IDs only) | populated products                                  | **Partially supported**                              | FR-API-07b                                                             |
 | Auth OTP                           | `/user/get-otp`, `/user/check-otp`             | —                                                   | **Supported**                                        | Unchanged (risk R6 noted)                                              |
+| Telegram sign-in, sign-up, link    | —                                              | auth attempt, bot, `telegramChatId` on User         | **Not supported**                                    | FR-API-18..21 (P1)                                                     |
+| Unlink Telegram                    | —                                              | —                                                   | **Not supported**                                    | FR-API-18 (`DELETE /user/telegram`)                                    |
+| Profile completion for Telegram users | `POST /user/complete-profile`               | accept a Telegram-verified user                     | **Partially supported** (requires `isVerifiedPhoneNumber`) | FR-API-18 (guard change)                                         |
 | Category image                     | — (`icon` never set)                           | `icon.lg`                                           | **Not supported**                                    | FR-API-11                                                              |
 
 ### 8.2 Required changes: commerce correctness (P0)
@@ -659,6 +732,64 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 - All changes are additive. Existing request and response fields keep their meaning, so the admin panel and current clients keep working.
 - Authorization: cart, wishlist, and quantity endpoints sit behind `verifyAccessToken`. Catalogue reads keep `decideAuthMiddleware`.
 
+### 8.6 Required changes: Telegram authentication (P1, decided Q20–Q22)
+
+Reference: §6.6.1. All changes are additive. Phone OTP endpoints and their responses are unchanged.
+
+**New packages:** `grammy` and `express-rate-limit` (server), `qrcode.react` (client, QR rendering as SVG), as in the reference. Versions are chosen at implementation. No other new dependency.
+
+**FR-API-18 — Telegram auth endpoints** (all under `/api/user/telegram`, mounted in the existing user router)
+
+| Method | Path        | Auth                       | Behaviour                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------ | ----------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/start`    | none                       | Discards the attempt named by this browser's cookie (if any), creates a new `AuthSession` (FR-API-20), sets the `telegramAuthSession` cookie to the raw session ID, and returns `201 {statusCode, data: {deepLink, expiresAt}}`. `deepLink` = `https://t.me/<TELEGRAM_BOT_USERNAME>?start=<nonce>`.                                                                                                                          |
+| POST   | `/link`     | `verifyAccessToken`        | 409 when the user already has `telegramChatId`. Otherwise like `/start`, but the attempt has purpose `LINK` and is bound to the caller.                                                                                                                                                                                                                                                                                        |
+| GET    | `/status`   | cookie                     | `{status, expiresAt, otpExpiresAt?, resendAvailableAt?}`. `resendAvailableAt` is `null` once the resend limit is used. A missing, unknown, or expired attempt answers `EXPIRED` (never 404).                                                                                                                                                                                                                                    |
+| POST   | `/verify`   | cookie (+ access cookie for `LINK`) | Body `{code}` (Joi: exactly 6 digits). Order of checks: attempt live and not locked; for `LINK`, the caller must be signed in (401 lets the client refresh and retry without spending an attempt) and must be the user bound to the attempt (else 403 and the attempt expires); a code is pending (409); the code has not expired (410); the HMAC matches (else 400 with attempts left, atomic `$inc`; the 5th failure locks, 423). On success, the attempt is claimed atomically on its exact `otpHash` (single use) and: **known chat** → purpose `LOGIN`, refresh `telegramUsername` if it changed, set the session cookies; **unknown chat** → purpose `SIGNUP`, create the user (FR-API-20), set the session cookies; **`LINK`** → set `telegramChatId` / `telegramUsername` on the caller with a conditional update (`telegramChatId` absent); 409 if the chat is linked to anyone else. The response matches `check-otp`: `{statusCode, data: {message, user}}`. The attempt cookie is cleared. |
+| POST   | `/resend`   | cookie                     | Requires `AWAITING_OTP`. Refuses within 60 s of the last code (429, with the seconds left) and after 3 resends (429). The new code replaces the old one and resets the attempt counter. The update is conditional on the previous `lastSentAt`, so two parallel resends send one code.                                                                                                                                         |
+| DELETE | `/`         | `verifyAccessToken`        | Unlinks Telegram (`$unset telegramChatId, telegramUsername`). Refused with 400 when the user has no verified phone number, because an account must always keep one sign-in method.                                                                                                                                                                                                                                          |
+
+- **Attempt cookie** `telegramAuthSession`: signed (existing `COOKIE_PARSER_SECRET_KEY`), httpOnly, `secure`, `SameSite=Lax`, `path=/api/user/telegram`, `domain=DOMAIN`, max age 15 min. It holds the raw session ID; the nonce only travels in the deep link.
+- **Profile completion guard:** `completeProfile` currently rejects users without `isVerifiedPhoneNumber` (`server/app/http/controllers/user/user.controller.js`, **[Verified]**). Change it to accept a user who has a verified phone number **or** a linked `telegramChatId`. Phone users are unaffected.
+- **Session issuing** reuses the existing `setAccessToken` / `setRefreshToken` (`server/utils/functions.js`). No new token type, lifetime, or cookie name for the session itself.
+
+**FR-API-19 — Telegram bot integration**
+
+- Library: **grammY** (`grammy`), as in the reference. The bot handles `/start <nonce>` in private chats only: it claims the attempt and replies with the code. `/start` without a payload, and any other text, gets a Persian welcome message explaining how to sign in from the website.
+- **Claim rule:** the bot moves an attempt from `PENDING` to `AWAITING_OTP` with one atomic conditional update (`status: PENDING`, `expiresAt > now`), storing `telegramId`, `telegramUsername`, the display name, and the code HMAC. A used, unknown, or expired nonce gets the "expired" reply.
+- **Modes** (derived from the environment at startup):
+  - `bot`: a token is set. The bot talks to Telegram.
+  - `log`: no token and `NODE_ENV !== "production"`. Bot messages, including codes, are written to the server log and nothing is sent (consistent with the dev OTP decision, sub-PRD 09 §4.1). In tests nothing is printed.
+  - `unavailable`: no token in production. Every `/user/telegram/*` endpoint answers 503 with a Persian message.
+- **Transport:** `TELEGRAM_MODE=polling` (default) or `webhook`. Polling deletes any registered webhook first. Webhook mode registers `POST /api/telegram/webhook` (exact path set at implementation), requires `SERVER_URL` to be a public `https://` origin, and rejects requests whose `X-Telegram-Bot-Api-Secret-Token` header doesn't match `TELEGRAM_WEBHOOK_SECRET`.
+- The bot starts from the server entry (`server/index.js`) after the database connects, not inside the `Application` constructor, so tests can build the app without a bot. Shutdown stops polling.
+- **Logging:** bot errors log the error message only, never the Telegram update (it contains the person's name).
+- **Environment (new names; values are secrets and never committed):** `TELEGRAM_BOT_TOKEN` (optional, see modes), `TELEGRAM_BOT_USERNAME` (5–32 letters, digits, or underscores; validated at startup), `TELEGRAM_MODE` (`polling` | `webhook`, default `polling`), `TELEGRAM_WEBHOOK_SECRET` (required in webhook mode). Webhook mode reuses the existing `SERVER_URL`. The code HMAC key reuses `ACCESS_TOKEN_SECRET_KEY`, as the reference reuses its access-token secret. Startup fails fast on an invalid username or an incomplete webhook configuration. `server/.env.example` documents all of them.
+
+**FR-API-20 — Data model**
+
+- **New collection `AuthSession`** (one Telegram attempt):
+
+  | Field                                  | Type                                                                                       | Notes                                                                                                   |
+  | -------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+  | `sessionIdHash`, `nonceHash`           | String, required, unique                                                                   | SHA-256 of 24-byte random values (48 hex chars, inside Telegram's 64-char `/start` payload limit)       |
+  | `purpose`                              | `LOGIN` \| `SIGNUP` \| `LINK`                                                              | `LINK` is set at creation; `LOGIN` / `SIGNUP` at verification                                           |
+  | `status`                               | `PENDING` \| `AWAITING_OTP` \| `COMPLETED` \| `EXPIRED` \| `LOCKED`, default `PENDING`     | No `AWAITING_PROFILE` (§6.6.1, Adaptations)                                                             |
+  | `user`                                 | ObjectId → User                                                                            | `LINK`: the caller. `LOGIN` / `SIGNUP`: the user signed in or created                                   |
+  | `telegramId`, `telegramUsername`, `prefillDisplayName` | Number (indexed), String, String                                           | Set by the bot claim                                                                                    |
+  | `otpHash`, `otpExpiresAt`, `lastSentAt` | String, Date, Date                                                                        | `otpHash` = HMAC-SHA256 of `<sessionIdHash>:<code>`. Removed once the code is used                      |
+  | `attempts`, `resends`                  | Number, default 0                                                                          | `attempts` resets on resend                                                                             |
+  | `expiresAt`                            | Date, required                                                                             | Now + 5 min. TTL index `expireAfterSeconds: 0` removes old attempts                                     |
+
+- **Constants:** attempt 5 min, code 2 min, resend cooldown 60 s, max 3 resends, max 5 wrong codes, client poll 2 s, attempt cookie 15 min. Codes are 6 random digits from a cryptographic source. Comparison is constant-time.
+- **User additions:** `telegramChatId: String` with a **unique sparse index**, and `telegramUsername: String` (handle without "@", refreshed on each Telegram sign-in). A new Telegram user is created with `telegramChatId`, `telegramUsername`, `name` = Telegram display name (if any), `role: "USER"`, `isActive: false`, and no `phoneNumber`. Existing users are untouched.
+
+**FR-API-21 — Rate limiting**
+
+- Per-IP limits with `express-rate-limit` (in-memory store, single server instance **[Assumption]**), per 15-minute window: `start` and `link` 10, `status` 600 (the client polls every 2 s for up to 5 min), `verify` 30, `resend` 10. These are on top of the per-attempt caps.
+- Behind a reverse proxy, Express `trust proxy` must be set so the client IP is correct **[Unverified: hosting]**.
+- Limits are skipped in the test environment unless a test turns them on to test them.
+
 ---
 
 ## 9. Data and integration requirements
@@ -674,6 +805,8 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 | Product  | `isFeatured`, `featuredOrder`, `soldCount`                                                      | P2       | Defaults                                    |
 | Category | Persist `parentId` correctly; `icon` writable                                                   | P1       | None                                        |
 | User     | No change required. (The duplicate `likedProducts` declaration should be removed as a cleanup.) | P2       | None                                        |
+| User     | `telegramChatId` (unique, sparse) and `telegramUsername` (FR-API-20)                            | P1       | None; absent on existing users. Index build only |
+| AuthSession | New collection with a TTL index on `expiresAt` (FR-API-20)                                   | P1       | —                                           |
 | Review   | New collection                                                                                  | P2       | —                                           |
 
 ### 9.2 Integration rules
@@ -682,6 +815,9 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 - **Pricing invariant (decided, Q16):** the server computes `offPrice = Math.round(price × (1 − discount / 100))` (nearest whole Toman) on create and update. Admins no longer enter `offPrice`. A one-off migration recomputes it for existing products.
 - **Currency:** prices are displayed as Toman (`"تومان"` labels in the client) **[Assumption: stored values are Toman]**.
 - **Cookies across client and API:** the Next server forwards cookies to the API for RSC fetches (`toStringCookies`). New server-rendered, user-specific data (for example `isLiked`) must keep forwarding cookies and must not be cached across users (dynamic rendering or `no-store` for those fetches).
+- **Telegram calls are browser-only:** every `/user/telegram/*` call is made by the browser through the existing axios instance (`withCredentials`), so the path-scoped `telegramAuthSession` cookie is sent. They are never made from RSC.
+- **Identity without a phone number:** after Telegram sign-up, a user may have no `phoneNumber`. Server code that assumes one (for example `getOtp` lookups, the admin user search, payment `populate` selects) keeps working because it only reads the field; display code follows FR-TG-09.
+- **Telegram API reachability:** in `bot` mode the server must reach `api.telegram.org` over HTTPS (polling) or be reachable by Telegram (webhook). **Decided (Q23):** the server reaches Telegram through a VPN. If the VPN runs system-wide on the host, no app setting is needed. If it is only available as a proxy, the bot's HTTP client must be configured to use it (an optional proxy variable, added at implementation). **[Unverified: which of the two]**
 
 ### 9.3 Compatibility with existing surfaces
 
@@ -707,9 +843,10 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 | NFR-11 | SEO                    | Unique `<title>` and description per page, using the format `<page title> \| NEXAIVON`; Open Graph `siteName` is `NEXAIVON`. `generateMetadata` on the PDP and the category-filtered listing. Product JSON-LD on the PDP. Canonical URL on `/products` ignoring sort params **[Proposed]**. Description text no longer reads "پنل مدیریت ادمین" on storefront pages. |
 | NFR-12 | States                 | Every data-driven section implements loading (skeleton), empty, and error states as specified in §6.                                                                                                                                                                                                                                                                 |
 | NFR-13 | API errors             | The client shows the server `message` when present, otherwise a generic Persian message. No raw error objects or `undefined` toasts (today `toast.error(error?.response?.data?.message)` can toast `undefined`).                                                                                                                                                     |
-| NFR-14 | Security               | User-specific operations stay behind `verifyAccessToken`. The `next` redirect parameter only accepts relative same-origin paths. No client-trusted price or stock. Detail endpoints stop leaking liker IDs (FR-API-07).                                                                                                                                              |
+| NFR-14 | Security               | User-specific operations stay behind `verifyAccessToken`. The `next` redirect parameter only accepts relative same-origin paths. No client-trusted price or stock. Detail endpoints stop leaking liker IDs (FR-API-07). Telegram attempts store only hashes of the session ID, the nonce, and the code (FR-API-20); a nonce and a verified code are each single use; the attempt cookie is httpOnly and path-scoped (FR-API-18).                                                                                                                                              |
 | NFR-15 | Security (existing)    | `express.static(path.join(__dirname, ".."))` serves the `server/` directory (source files). Restrict it to the dedicated public uploads folder (FR-API-17) **[Proposed, P0 risk fix]**. Dotfiles such as `.env` are ignored by Express's static defaults, but this is **[Unverified at runtime]**.                                                                                         |
 | NFR-16 | Data integrity         | Existing cart, coupon, auth, and payment data remain readable after all migrations. All schema changes are additive.                                                                                                                                                                                                                                                 |
+| NFR-17 | Security (Telegram)    | `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` are secrets: never logged, never sent to the client, never committed. Telegram codes are logged only in `log` mode, which cannot be active in production (FR-API-19). Bot error logs never include the Telegram update. Telegram endpoints are rate-limited per IP (FR-API-21). An account always keeps at least one sign-in method (FR-API-18 unlink rule). |
 
 ---
 
@@ -750,10 +887,11 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 | Sticky mobile purchase bar                                | FR-PDP-14  | —                               |
 | Wishlist page                                             | FR-W-03    | FR-API-07b (optional)           |
 | Auth return-to (`next`)                                   | FR-AUTH-01 | —                               |
+| Telegram sign-in, sign-up, link and unlink (Q20–Q22)      | FR-TG-01..09 | FR-API-18..21                 |
 | Category images                                           | FR-C-03    | FR-API-11                       |
 | Light micro-interactions (CSS-only)                       | §5.2       | —                               |
 
-**Justification:** search and filters directly serve shopping. Gallery and specs are expected for electronics. Each depends on a contained, additive backend change.
+**Justification:** search and filters directly serve shopping. Gallery and specs are expected for electronics. Each depends on a contained, additive backend change. Telegram login gives shoppers a sign-in path that doesn't depend on SMS delivery; it is P1 because phone OTP already covers sign-in, and the bot adds hosting and network dependencies (R17, R19).
 
 ### 11.3 P2 — Optional
 
@@ -766,6 +904,8 @@ The current homepage (`client/src/app/(user)/page.jsx`) is replaced by the secti
 | Guest cart (FR-CART-07)                      | Auth-gated cart is acceptable. Merge logic adds risk.                                              |
 | Advanced motion or 3D product views          | Performance cost. Only with a measured budget.                                                     |
 | Personalisation and recommendations          | No data basis.                                                                                     |
+| Telegram follow-ups: admin unlink, adding a verified phone to a Telegram-only account, account merge | Not needed for the P1 flow (Q22). Merge needs ownership-proof rules for both accounts.          |
+| Verified phone change and a unique phone index (R18) | Pre-existing issue. Needs an OTP step on `PATCH /user/update` and a data check for existing duplicates. |
 
 ### 11.4 Dependency order
 
@@ -776,6 +916,7 @@ FR-API-06 (server) ──► category cards + listing filter (client)
 FR-API-03 ──► limits, related products, pagination
 FR-API-04 ──► search UI         FR-API-08/09 + admin form ──► gallery/specs UI
 FR-API-02 ──► quantity selector FR-API-07(b) ──► wishlist detail/page (interim client fallback exists)
+P0-14 (OTP fix) + FR-AUTH-02/03 (auth restyle, accessible code input) ──► FR-API-20 → FR-API-19 → FR-API-18/21 (server) ──► FR-TG-01..09 (client)
 ```
 
 ---
@@ -802,6 +943,10 @@ Homepage: **AC-HOME-01..06** (§6.1). PDP: **AC-PDP-01..11** (§6.2). Listing: *
 - **AC-WISH-02** A guest toggling is redirected to `/auth`.
 - **AC-WISH-03** The same product shows the same state on the listing, PDP, and wishlist page.
 
+**Telegram login (P1)**
+
+- **AC-TG-01..12** (§6.6.1).
+
 **Variants (only if FR-API-10 is implemented)**
 
 - **AC-VAR-01** Selecting a variant updates price, stock, image, and URL. Unavailable variants are disabled with an explanation. The cart line records the chosen variant.
@@ -822,6 +967,7 @@ Homepage: **AC-HOME-01..06** (§6.1). PDP: **AC-PDP-01..11** (§6.2). Listing: *
 ### 12.11 Regression checks (existing functionality)
 
 - OTP login → complete profile → profile page shows the user and payments.
+- After Telegram login ships: phone OTP sign-in, `check-otp` response shape, cookie names and lifetimes, and `/complete-profile` for phone users behave exactly as before.
 - Admin can list, add, edit, and delete products, categories, and coupons; view users and payments. `/admin` is still blocked for non-admins (`client/src/middleware.js`).
 - Dark-mode toggle persists (`localStorage` key `isDarkMode`).
 - Logout clears the session.
@@ -831,8 +977,8 @@ Homepage: **AC-HOME-01..06** (§6.1). PDP: **AC-PDP-01..11** (§6.2). Listing: *
 
 | Layer                       | Tooling **[Proposed]**                                     | Coverage                                                                                                                                                                                                       |
 | --------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Server unit and integration | Jest or Vitest plus Supertest plus `mongodb-memory-server` | `getUserCartDetail` (discounts, coupons, invalid coupon), cart add/remove/quantity with stock limits, payment validation and decrement, product list filters/sort/pagination/unknown category, wishlist toggle |
-| Client unit and component   | Vitest or Jest plus React Testing Library                  | `Price`, `StockBadge`, `ProductCard`, `QuantityStepper` bounds, `WishlistButton` optimistic rollback, safe `next` redirect parsing                                                                             |
+| Server unit and integration | Jest or Vitest plus Supertest plus `mongodb-memory-server` | `getUserCartDetail` (discounts, coupons, invalid coupon), cart add/remove/quantity with stock limits, payment validation and decrement, product list filters/sort/pagination/unknown category, wishlist toggle, Telegram attempt state machine (AC-TG-01..11, calling the bot `/start` handler directly) |
+| Client unit and component   | Vitest or Jest plus React Testing Library                  | `Price`, `StockBadge`, `ProductCard`, `QuantityStepper` bounds, `WishlistButton` optimistic rollback, safe `next` redirect parsing, Telegram panel phases (QR, code, expired, locked, unavailable) with a mocked API |
 | End-to-end                  | Playwright (with seed data)                                | Journeys in §2.2; AC-HOME, AC-PDP, AC-LIST, AC-CART; viewport matrix; axe scan                                                                                                                                 |
 | Manual                      | Visual QA in RTL, light and dark                           | Design sign-off                                                                                                                                                                                                |
 
@@ -860,6 +1006,10 @@ Adding these tools changes `package.json`, **Decided (Q17):** Vitest + Supertest
 | R14 | No tests or seed data                                                                                                             | repo                                          | Regressions go undetected                                    | P0-12                                                                                                     |
 | R15 | Persian full-text search quality                                                                                                  | MongoDB text-search language support          | Poor search relevance                                        | Regex fallback (FR-API-04) **[Unverified]**                                                               |
 | R16 | Two separate git repos with independent deploys                                                                                   | `client/.git`, `server/.git`                  | Frontend features shipping before their API                  | Feature flags or ordering per §11.4                                                                       |
+| R17 | Polling bot needs a long-running server process; serverless or sleeping hosts drop updates                                        | FR-API-19                                     | Telegram codes never arrive                                  | **Bot created by the owner (Q24)**; token and username go in `server/.env`. Remaining: polling on an always-on host, or webhook mode with a public HTTPS `SERVER_URL` **[Unverified: hosting]** |
+| R18 | `PATCH /user/update` sets `phoneNumber` without verifying it, and `phoneNumber` has no unique index                               | `user.controller.js`, `user.schema.js`, `models/user.js` | A Telegram-only user (or any user) can set someone else's number; `getOtp` / `checkOtp` look users up by `findOne({phoneNumber})` and may match the wrong account | Pre-existing; made more visible by phone-less accounts. Telegram does not depend on it. Fix proposed in the backlog (sub-PRD 12) |
+| R19 | Telegram is restricted in Iran. Iranian-hosted servers may not reach `api.telegram.org`, and some shoppers need a VPN to use Telegram | network policy **[Unverified]**               | Telegram login unusable for part of the audience, or entirely if the server can't reach Telegram | **Decided (Q23): VPN.** The server reaches Telegram through a VPN, and shoppers use their own VPN. Phone OTP stays the default tab for anyone without one. `unavailable` mode returns 503 cleanly (AC-TG-10). Confirm reachability through the VPN from the server host before enabling `bot` mode |
+| R20 | Duplicate accounts: a phone user who signs up with Telegram instead of linking gets a second account                              | FR-API-18 (no automatic merge)                | Cart, wishlist, and orders split across two accounts          | Duplicate-email hint on `/complete-profile` (FR-TG-08); linking from the profile (FR-TG-07). Merge is out of scope |
 
 ---
 
@@ -880,6 +1030,7 @@ Adding these tools changes `package.json`, **Decided (Q17):** Vitest + Supertest
 | Order placement                                                 | Yes (no gateway, buggy decrement) | Validation plus quantity-aware decrement                 | BE                    |
 | Wishlist (likes) toggle                                         | Yes                               | Heart UI, optimistic, `isLiked` on detail, wishlist page | FE + BE               |
 | OTP auth plus profile completion                                | Yes                               | Restyle plus `next` redirect                             | FE                    |
+| Telegram sign-in, sign-up, link, unlink                         | No                                | Added (P1), reference: `-inventory-app-ai`               | FE + BE + Profile card |
 | Dark mode                                                       | Yes                               | New tokens for both themes                               | FE                    |
 | Admin panel                                                     | Yes                               | Preserved; small inputs for new fields only              | Admin                 |
 | Featured content / CMS                                          | No                                | Static config (P0); flag (P2)                            | FE / BE               |
@@ -915,6 +1066,11 @@ All open questions are resolved. Question IDs are kept stable so references else
 | Q18 | Fix the OTP singleton-state issue here?                | **Yes, in this project (P0-14).**                                                                                                                | R6                         |
 | Q19 | Seed category set?                                     | **Smartphones, headphones, smartwatches, accessories.**                                                                                         | Seed data, category cards  |
 | —   | OTP in development and tests?                          | **Outside production, skip Kavenegar and write the OTP to the server log.** Tests read it from there.                                           | Seed data, tests           |
+| Q20 | Telegram login priority?                               | **P1.** Phone OTP covers sign-in until it ships.                                                                                                 | §6.6.1, §8.6, §11.2        |
+| Q21 | Telegram for sign-up too, or only for linked accounts? | **Sign-up and sign-in.** An unknown Telegram account becomes a new user who completes the existing `/complete-profile`.                         | FR-TG-06/08, FR-API-18/20  |
+| Q22 | Link and unlink Telegram from the profile?             | **Yes.** A minimal "sign-in methods" card in the profile panel. Unlink is refused when Telegram is the only sign-in method.                      | FR-TG-07, FR-API-18        |
+| Q23 | Telegram is restricted in Iran. How is it reached?     | **VPN.** The server reaches Telegram through a VPN; shoppers use their own. Phone OTP remains the default for everyone else.                   | R19, §9.2, A8              |
+| Q24 | Who provides the bot?                                  | **The owner created the bot** and supplies `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_USERNAME` in `server/.env` (never committed, NFR-17).        | R17, FR-API-19             |
 
 ### 15.2 Assumptions
 
@@ -927,6 +1083,7 @@ All open questions are resolved. Question IDs are kept stable so references else
 | A5  | Admin users will enter new product data (images, specs) through minimal additions to the existing admin form.                                                   |
 | A6  | Deployment targets (Vercel vs Netlify for the client; server host) don't constrain the proposed rendering modes.                                                |
 | A7  | "Portfolio reviewer" is a design-quality persona, not a system role.                                                                                            |
+| A8  | The server runs as a single always-on instance that reaches `api.telegram.org` through a VPN (Q23), so polling mode and in-memory rate limits are enough (R17, R19, FR-API-21). |
 
 ---
 
