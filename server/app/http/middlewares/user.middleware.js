@@ -39,10 +39,15 @@ async function verifyAccessToken(req, res, next) {
 }
 
 
+// Optional auth: a valid token sets req.user, while a missing, expired or
+// invalid one leaves the request as a guest instead of failing with 401 (R7).
 function decideAuthMiddleware(req, res, next) {
   const accessToken = req.signedCookies["accessToken"];
   if (accessToken) {
-    return verifyAccessToken(req, res, next);
+    return verifyAccessToken(req, res, (error) => {
+      if (error?.status === 401) return next();
+      next(error);
+    });
   }
   // skip this middleware
   next();

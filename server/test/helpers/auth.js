@@ -15,11 +15,21 @@ export async function signedInCookie(role = "USER") {
     isActive: true,
     role,
   });
-  const token = JWT.sign(
-    { _id: user._id },
-    process.env.ACCESS_TOKEN_SECRET_KEY,
-    { expiresIn: "1h" }
+  return cookieForUser(user);
+}
+
+// Returns a Cookie header with a valid access token for an existing user.
+export function cookieForUser(user) {
+  return accessTokenCookie(
+    JWT.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET_KEY, {
+      expiresIn: "1h",
+    })
   );
+}
+
+// Wraps a raw JWT in a correctly signed accessToken cookie, so tests can send
+// tokens that are expired or signed with the wrong key.
+export function accessTokenCookie(token) {
   const value = `s:${signature.sign(token, process.env.COOKIE_PARSER_SECRET_KEY)}`;
   return `accessToken=${encodeURIComponent(value)}`;
 }
