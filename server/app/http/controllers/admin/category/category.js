@@ -4,12 +4,17 @@ const createHttpError = require("http-errors");
 const {
   addCategorySchema,
   updateCategorySchema,
+  categoryListQuerySchema,
 } = require("../../../validators/admin/category.shcema");
 const { CategoryModel } = require("../../../../models/category");
 
 class CategoryController extends Controller {
   async getListOfCategories(req, res) {
-    const query = req.query;
+    // Never pass req.query to find: a parsed `type[$ne]=x` would inject an
+    // operator. The schema keeps only `type` and `parentId`, as strings.
+    const query = await categoryListQuerySchema.validateAsync(req.query, {
+      stripUnknown: true,
+    });
     const categories = await CategoryModel.find(query);
     if (!categories)
       throw createHttpError.ServiceUnavailable("دسته بندی ها یافت نشد");

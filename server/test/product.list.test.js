@@ -53,3 +53,57 @@ describe("GET /api/product/list (guest)", () => {
     expect(product.isLiked).toBe(false);
   });
 });
+
+describe("GET /api/product/list?category=", () => {
+  async function seedPhoneAndWatch() {
+    const [phones, watches] = await CategoryModel.create([
+      { title: "گوشی موبایل", englishTitle: "smartphones", description: "Phones" },
+      { title: "ساعت هوشمند", englishTitle: "smartwatches", description: "Watches" },
+    ]);
+    const base = {
+      description: "A product for tests",
+      imageLink: "uploads/test.png",
+      price: 1000,
+      offPrice: 1000,
+      brand: "TestBrand",
+      countInStock: 5,
+    };
+    await ProductModel.create([
+      { ...base, title: "Phone", slug: "phone", category: phones._id },
+      { ...base, title: "Watch", slug: "watch", category: watches._id },
+    ]);
+  }
+
+  it("returns 200 with no products for an unknown category", async () => {
+    await seedPhoneAndWatch();
+
+    const res = await request(createApp()).get(
+      "/api/product/list?category=unknown"
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.products).toEqual([]);
+  });
+
+  it("ignores unknown categories mixed with known ones", async () => {
+    await seedPhoneAndWatch();
+
+    const res = await request(createApp()).get(
+      "/api/product/list?category=unknown,smartwatches"
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.products.map((p) => p.slug)).toEqual(["watch"]);
+  });
+
+  it("does not apply a query operator passed as category", async () => {
+    await seedPhoneAndWatch();
+
+    const res = await request(createApp()).get(
+      "/api/product/list?category[$ne]=smartphones"
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.products).toEqual([]);
+  });
+});

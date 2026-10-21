@@ -64,14 +64,16 @@ class ProductController extends Controller {
     // console.log({ category, sort, type });
     if (search) dbQuery["$text"] = { $search: search };
     if (category) {
-      const categories = category.split(",");
-      const categoryIds = [];
-      for (const item of categories) {
-        const { _id } = await CategoryModel.findOne({ englishTitle: item });
-        categoryIds.push(_id);
-      }
+      // Unknown englishTitles are ignored; if none match, the $in is empty
+      // and the list comes back empty. A non-string value (e.g. a parsed
+      // `category[$ne]=x` object) matches nothing.
+      const names = typeof category === "string" ? category.split(",") : [];
+      const categories = await CategoryModel.find(
+        { englishTitle: { $in: names } },
+        { _id: 1 }
+      );
       dbQuery["category"] = {
-        $in: categoryIds,
+        $in: categories.map(({ _id }) => _id),
       };
     }
 

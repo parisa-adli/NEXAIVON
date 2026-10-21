@@ -27,7 +27,7 @@ Size: **S** ≈ ½ day, **M** ≈ 1–2 days, **L** ≈ 3–4 days.
 | ✅ S-04 | Seed script `npm run seed`: 4 categories, every fixture of 11 §2 (stock 0/1–3/plenty, coupons, non-product category, admin + user); idempotent, refuses production | 11 §2, Q19 | M | S-03 | Re-running gives identical data; client lane can run against it |
 | ✅ S-05 | Restrict `express.static` to a dedicated uploads folder; move any file that must stay public | 03 §3.5, NFR-15 | S | S-01 | AC-API-08. Note: serve `server/uploads` at `/uploads`, or the seed's `SERVER_URL/uploads/seed/*` image links (S-04) break |
 | ✅ S-06 | Admin image upload endpoint (type/size limits, no path escape) | 03 §3.7, FR-API-17 | M | S-05 | AC-API-10. Note: `client/next.config.js` `remotePatterns` must allow the API host, or `/uploads` images (seed included) won't render through `next/image` |
-| S-07 | Safe category handling: whitelist `/category/list` keys; unknown `?category=` → `[]` | 03 §3.4, FR-API-06 | S | S-01 | AC-API-04, AC-API-05 |
+| ✅ S-07 | Safe category handling: whitelist `/category/list` keys; unknown `?category=` → `[]` | 03 §3.4, FR-API-06 | S | S-01 | AC-API-04, AC-API-05 |
 | S-08 | Optional auth treats an expired/invalid token as guest | 03 §3.6, R7 | S | S-01 | AC-API-09 |
 | S-09 | `limit` + `pagination` on `/product/list`; fix `sort=popular` | 03 §3.1, §3.3 (FR-API-03 P0, FR-API-05 popular) | M | S-01 | AC-API-01, 02, 03, 06 |
 | S-10 | Stock validation on `/cart/add` and `/payment/create`; `countInStock` in cart detail; null-coupon guard | 07 §3.1–3.3 (FR-API-01, 01b, 15) | M | S-01, S-04 | AC-CART-06, AC-CART-08, AC-PDP-05 (server half) |

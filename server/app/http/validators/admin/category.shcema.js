@@ -56,7 +56,19 @@ const updateCategorySchema = Joi.object({
     .error(createHttpError.BadRequest("نوع دسته بندی صحیح نمی باشد")),
 });
 
+// Query for the public GET /category/list. Only these keys reach the DB;
+// validate with { stripUnknown: true } so any other key is dropped.
+const categoryListQuerySchema = Joi.object({
+  type: Joi.string()
+    .valid("product", "post", "comment", "ticket")
+    .error(createHttpError.BadRequest("نوع دسته بندی صحیح نمی باشد")),
+  parentId: Joi.string()
+    .pattern(MongoIDPattern)
+    .error(createHttpError.BadRequest("شناسه ارسال شده صحیح نمیباشد")),
+});
+
 module.exports = {
   addCategorySchema,
   updateCategorySchema,
+  categoryListQuerySchema,
 };
