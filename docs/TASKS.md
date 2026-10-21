@@ -23,7 +23,7 @@ Size: **S** ≈ ½ day, **M** ≈ 1–2 days, **L** ≈ 3–4 days.
 | S-02 | OTP singleton fix + dev/test OTP written to log (no Kavenegar outside production) | 09 §4.1, P0-14 | S | S-01 | AC-AUTH-05, AC-AUTH-06 |
 | S-03 | Server-computed `offPrice` on create/update, Joi drops `offPrice`, one-off migration script | 07 §5, Q16 | S | S-01 | AC-CART-11 |
 | S-04 | Seed script `npm run seed`: 4 categories, every fixture of 11 §2 (stock 0/1–3/plenty, coupons, non-product category, admin + user); idempotent, refuses production | 11 §2, Q19 | M | S-03 | Re-running gives identical data; client lane can run against it |
-| S-05 | Restrict `express.static` to a dedicated uploads folder; move any file that must stay public | 03 §3.5, NFR-15 | S | S-01 | AC-API-08 |
+| S-05 | Restrict `express.static` to a dedicated uploads folder; move any file that must stay public | 03 §3.5, NFR-15 | S | S-01 | AC-API-08. Note: serve `server/uploads` at `/uploads`, or the seed's `SERVER_URL/uploads/seed/*` image links (S-04) break |
 | S-06 | Admin image upload endpoint (type/size limits, no path escape) | 03 §3.7, FR-API-17 | M | S-05 | AC-API-10 |
 | S-07 | Safe category handling: whitelist `/category/list` keys; unknown `?category=` → `[]` | 03 §3.4, FR-API-06 | S | S-01 | AC-API-04, AC-API-05 |
 | S-08 | Optional auth treats an expired/invalid token as guest | 03 §3.6, R7 | S | S-01 | AC-API-09 |
@@ -35,7 +35,7 @@ Size: **S** ≈ ½ day, **M** ≈ 1–2 days, **L** ≈ 3–4 days.
 | S-13 | `PATCH /cart/quantity` | 07 §3.5 (FR-API-02) | S | S-10 | Bounds 1..stock enforced, returns cart detail |
 | S-14 | Detail endpoints return `isLiked`/`likesCount`, omit `likes[]` for non-admins (check admin usage first); `GET /user/wishlist` | 08 §4 (FR-API-07, 07b) | M | S-01 | AC-WISH-05 |
 | S-15 | Product `images[]`, `specs[]`; category `icon.sm/lg`; `parent` → `parentId` fix | 10 §3 (FR-API-08, 09, 11) | M | S-06 | AC-EXT-01, 02, 04 |
-| S-16 | Telegram data model: `AuthSession` + User fields + TTL index; env vars + fail-fast validation | 09 §4.3.2 items 1, 7 | S | S-02 | Model tests pass |
+| S-16 | Telegram data model: `AuthSession` + User fields + TTL index; env vars + fail-fast validation | 09 §4.3.2 items 1, 7 | S | S-02 | Model tests pass. Note: extend the S-04 seed with the 11 §2 Telegram users (phone + Telegram linked; Telegram-only, no `phoneNumber`) |
 | S-17 | Telegram bot (grammY; `bot`/`log`/`unavailable` modes) started after DB connect | 09 §4.3.2 item 2 | M | S-16 | AC-TG-10 |
 | S-18 | Telegram service + routes (`start`, `link`, `status`, `verify`, `resend`, `DELETE`), injectable `now` | 09 §4.3.2 items 3–4 | L | S-17 | AC-TG-01..09 |
 | S-19 | `completeProfile` accepts phone **or** Telegram; `express-rate-limit` on Telegram routes | 09 §4.3.2 items 5–6 | S | S-18 | AC-TG-11 + phone OTP regression green |
