@@ -313,6 +313,12 @@ async function checkProductExist(id) {
   return product;
 }
 
+// Sale price in whole Toman (Q16). The server owns offPrice: it is never
+// taken from the client.
+function computeOffPrice(price, discount = 0) {
+  return Math.round(price * (1 - discount / 100));
+}
+
 function invoiceNumberGenerator() {
   return (
     moment().format("jYYYYjMMjDDHHmmssSSS") +
@@ -330,6 +336,7 @@ module.exports = {
   copyObject,
   deleteInvalidPropertyInObject,
   checkProductExist,
+  computeOffPrice,
   invoiceNumberGenerator,
   secretKeyGenerator,
 };

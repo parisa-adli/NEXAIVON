@@ -31,9 +31,9 @@ const addProductSchema = Joi.object({
     .required()
     .regex(MongoIDPattern)
     .error(createError.BadRequest("دسته بندی مورد نظر  صحیح نمی باشد")),
-  offPrice: Joi.number().error(
-    createError.BadRequest("قیمت وارد شده صحیح نمیباشد")
-  ),
+  // The server computes offPrice (Q16); the controller never reads it. Still
+  // allowed so the admin form validates until it stops sending it (C-16).
+  offPrice: Joi.any().strip(),
   price: Joi.number()
     .required()
     .error(createError.BadRequest("قیمت وارد شده صحیح نمیباشد")),
@@ -43,9 +43,9 @@ const addProductSchema = Joi.object({
 });
 
 const changeCourseDiscountSchema = Joi.object({
-  offPrice: Joi.number()
-    .required()
-    .error(createError.BadRequest("قیمت وارد شده صحیح نمیباشد")),
+  // The server computes offPrice (Q16); the controller never reads it. Still
+  // allowed so the admin form validates until it stops sending it (C-16).
+  offPrice: Joi.any().strip(),
   discount: Joi.number()
     .required()
     .allow(0)

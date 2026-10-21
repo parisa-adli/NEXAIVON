@@ -2,6 +2,7 @@ const Controller = require("../../controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 const mongoose = require("mongoose");
 const {
+  computeOffPrice,
   copyObject,
   deleteInvalidPropertyInObject,
 } = require("../../../../../utils/functions");
@@ -30,7 +31,6 @@ class ProductController extends Controller {
       category,
       price,
       discount = 0,
-      offPrice,
       countInStock,
     } = req.body;
 
@@ -44,7 +44,7 @@ class ProductController extends Controller {
       category,
       price,
       discount,
-      offPrice,
+      offPrice: computeOffPrice(price, discount),
       countInStock,
     });
     if (!product?._id)
@@ -160,12 +160,12 @@ class ProductController extends Controller {
   }
   async changeProductDiscountStatus(req, res) {
     const { id } = req.params;
-    await this.findProductById(id);
+    const product = await this.findProductById(id);
     await changeCourseDiscountSchema.validateAsync(req.body);
-    const { discount, offPrice } = req.body;
+    const { discount } = req.body;
     const result = await ProductModel.updateOne(
       { _id: id },
-      { $set: { discount, offPrice } }
+      { $set: { discount, offPrice: computeOffPrice(product.price, discount) } }
     );
     if (result.modifiedCount > 0) {
       return res.status(HttpStatus.OK).json({
@@ -192,10 +192,14 @@ class ProductController extends Controller {
   }
   async updateProduct(req, res) {
     const { id } = req.params;
-    await this.findProductById(id);
+    const product = await this.findProductById(id);
     const data = copyObject(req.body);
-    let blackListFields = ["bookmarks", "likes", "reviews"];
+    let blackListFields = ["bookmarks", "likes", "reviews", "offPrice"];
     deleteInvalidPropertyInObject(data, blackListFields);
+    data.offPrice = computeOffPrice(
+      data.price ?? product.price,
+      data.discount ?? product.discount
+    );
     const updateProductResult = await ProductModel.updateOne(
       { _id: id },
       {
