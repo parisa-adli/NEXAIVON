@@ -12,7 +12,8 @@ const { CouponModel } = require("../app/models/coupon");
 const { UserModel } = require("../app/models/user");
 const { PaymentModel } = require("../app/models/payment");
 const { computeOffPrice } = require("../utils/functions");
-const { UPLOADS_DIR, UPLOADS_URL_PATH } = require("../utils/constants");
+const { UPLOADS_DIR } = require("../utils/constants");
+const { uploadUrl } = require("../utils/uploads");
 const fixtures = require("./seed/fixtures");
 
 // Throws unless the environment is clearly not production. The seed wipes
@@ -38,7 +39,7 @@ async function seed({ uploadsDir = UPLOADS_DIR } = {}) {
 
   const products = fixtures.products.map(({ image, ...product }) => ({
     ...product,
-    imageLink: `${process.env.SERVER_URL}${UPLOADS_URL_PATH}/${IMAGES_SUBDIR}/${image}`,
+    imageLink: uploadUrl(IMAGES_SUBDIR, image),
     offPrice: computeOffPrice(product.price, product.discount),
   }));
 
@@ -54,11 +55,9 @@ async function main() {
   require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
   // Checked again in seed(); here it fails before connecting.
   assertSeedAllowed(process.env);
-  for (const name of ["APP_DB", "SERVER_URL"]) {
-    if (!process.env[name]) {
-      console.log(`${name} is not set`);
-      process.exit(1);
-    }
+  if (!process.env.APP_DB) {
+    console.log("APP_DB is not set");
+    process.exit(1);
   }
   await mongoose.connect(process.env.APP_DB);
   try {

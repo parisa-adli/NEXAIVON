@@ -16,6 +16,7 @@ setupTestDb();
 
 const ADMIN_PHONE = "09120000001";
 const USER_PHONE = "09120000002";
+const SERVER_URL = "http://localhost:5000";
 
 // Seeds into a fresh temporary uploads folder and returns the app.
 async function seededApp() {
@@ -59,7 +60,7 @@ const applyCoupon = (app, cookie, couponCode) =>
 describe("seed guard", () => {
   it("refuses to run against production", () => {
     for (const NODE_ENV of ["production", " Production ", "PRODUCTION"])
-      expect(() => assertSeedAllowed({ NODE_ENV })).toThrow(/production/);
+      expect(() => assertSeedAllowed({ NODE_ENV, SERVER_URL })).toThrow(/production/);
   });
 
   it("refuses to run when NODE_ENV is not set", () => {
@@ -67,8 +68,8 @@ describe("seed guard", () => {
   });
 
   it("allows development and test", () => {
-    expect(() => assertSeedAllowed({ NODE_ENV: "development" })).not.toThrow();
-    expect(() => assertSeedAllowed({ NODE_ENV: "test" })).not.toThrow();
+    expect(() => assertSeedAllowed({ NODE_ENV: "development", SERVER_URL })).not.toThrow();
+    expect(() => assertSeedAllowed({ NODE_ENV: "test", SERVER_URL })).not.toThrow();
   });
 });
 

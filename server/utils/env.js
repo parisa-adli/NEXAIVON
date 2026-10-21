@@ -7,6 +7,12 @@ function validateEnv(env) {
     throw new Error(
       'NODE_ENV is not set. Set it to "production" in production, or "development" locally.'
     );
+  // Public upload URLs are built from it and stored in the database, so a
+  // missing value would save "undefined/uploads/..." links.
+  if (!env.SERVER_URL?.trim())
+    throw new Error(
+      "SERVER_URL is not set. Set it to this API's public origin, e.g. http://localhost:5000."
+    );
 }
 
 module.exports = { validateEnv };

@@ -28,7 +28,8 @@
     "jsonwebtoken": "^9.0.0",
     "kavenegar": "^1.1.4",
     "moment-jalali": "^0.3.9",
-    "mongoose": "^7.1.0"
+    "mongoose": "^7.1.0",
+    "multer": "^2.4.0"
   },
   "devDependencies": {
     "cookie-signature": "^1.0.6",

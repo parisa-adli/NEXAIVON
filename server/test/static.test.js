@@ -51,5 +51,7 @@ describe("static files (NFR-15)", () => {
     expect(res.status).toBe(200);
     expect(res.headers["content-type"]).toBe("image/png");
     expect(res.body.toString()).toBe("png bytes");
+    // Browsers must not sniff an upload into HTML or script.
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
   });
 });
