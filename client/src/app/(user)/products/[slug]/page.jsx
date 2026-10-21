@@ -6,6 +6,11 @@ import {
   toPersianNumbersWithComma,
 } from "@/utils/toPersianNumber";
 import Image from "next/image";
+// PROTOTYPE: product page variants (prototype/product-detail branch only)
+import { Suspense } from "react";
+import PrototypeSwitcher from "@/components/prototype/PrototypeSwitcher";
+import VariantView from "./_prototype/VariantView";
+import { PdpVariants, PDP_VARIANT_NAMES } from "./_prototype/PdpPrototype";
 
 export const dynamic = "force-static"; // SSG or {cache: "force-cache"}
 export const dynamicParams = false;
@@ -21,7 +26,7 @@ async function SlugPage({ params }) {
   const { slug } = await params;
   const { product } = await getOneProductBySlug(slug);
 
-  return (
+  const current = (
     <div className="px-4">
       <BreadCrumbs
         breadcrumbs={[
@@ -85,6 +90,17 @@ async function SlugPage({ params }) {
         </div>
       </div>
     </div>
+  );
+
+  // PROTOTYPE: the page is static, so the variant is chosen in the browser.
+  return (
+    <Suspense fallback={current}>
+      <PrototypeSwitcher
+        variants={["current", "A", "B", "C"]}
+        names={PDP_VARIANT_NAMES}
+      />
+      <VariantView variants={{ current, ...PdpVariants({ product }) }} />
+    </Suspense>
   );
 }
 export default SlugPage;
