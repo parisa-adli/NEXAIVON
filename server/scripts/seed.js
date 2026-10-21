@@ -12,6 +12,7 @@ const { CouponModel } = require("../app/models/coupon");
 const { UserModel } = require("../app/models/user");
 const { PaymentModel } = require("../app/models/payment");
 const { computeOffPrice } = require("../utils/functions");
+const { UPLOADS_DIR, UPLOADS_URL_PATH } = require("../utils/constants");
 const fixtures = require("./seed/fixtures");
 
 // Throws unless the environment is clearly not production. The seed wipes
@@ -25,12 +26,11 @@ function assertSeedAllowed(env) {
 // Seed images are copied to <uploadsDir>/seed and served from the API host
 // at /uploads/seed (FR-API-17).
 const IMAGES_SOURCE = path.join(__dirname, "seed", "images");
-const DEFAULT_UPLOADS_DIR = path.join(__dirname, "..", "uploads");
 const IMAGES_SUBDIR = "seed";
 
 // Empties the seeded collections and inserts the fixtures. Only the seed
 // subfolder of the uploads folder is replaced; admin uploads are kept.
-async function seed({ uploadsDir = DEFAULT_UPLOADS_DIR } = {}) {
+async function seed({ uploadsDir = UPLOADS_DIR } = {}) {
   assertSeedAllowed(process.env);
   const imagesDir = path.join(uploadsDir, IMAGES_SUBDIR);
   fs.rmSync(imagesDir, { recursive: true, force: true });
@@ -38,7 +38,7 @@ async function seed({ uploadsDir = DEFAULT_UPLOADS_DIR } = {}) {
 
   const products = fixtures.products.map(({ image, ...product }) => ({
     ...product,
-    imageLink: `${process.env.SERVER_URL}/uploads/${IMAGES_SUBDIR}/${image}`,
+    imageLink: `${process.env.SERVER_URL}${UPLOADS_URL_PATH}/${IMAGES_SUBDIR}/${image}`,
     offPrice: computeOffPrice(product.price, product.discount),
   }));
 

@@ -2,18 +2,20 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const createError = require("http-errors");
-const path = require("path");
 const { allRoutes } = require("./router/router");
+const { UPLOADS_DIR, UPLOADS_URL_PATH } = require("../utils/constants");
 
 // Builds the Express app only: no listen(), no DB connection, no dotenv.
 // Startup lives in index.js so tests can build the app on their own.
-function createApp() {
+function createApp({ uploadsDir = UPLOADS_DIR } = {}) {
   const app = express();
 
   app.use(cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN }));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.static(path.join(__dirname, "..")));
+  // Only the uploads folder is static: serving anything wider exposes
+  // server source (NFR-15).
+  app.use(UPLOADS_URL_PATH, express.static(uploadsDir));
   app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY));
 
   app.use("/api", allRoutes);
