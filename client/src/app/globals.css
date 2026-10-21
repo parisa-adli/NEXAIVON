@@ -33,6 +33,22 @@
       --color-error: 255, 71, 87;
       --color-red-500: 239, 68, 68;
       --color-red-300: 252, 165, 165;
+      /* Storefront palette (sub-PRD 01 §4.2). Only Storefront pages use these;
+         the primary and secondary colours above stay for the Admin panel and
+         the Account area. */
+      --color-page: 245, 242, 236;
+      --color-surface: 251, 249, 245;
+      --color-ink: 36, 36, 36;
+      --color-muted: 92, 92, 92;
+      --color-sage: 164, 173, 152;
+      --color-sand: 217, 189, 167;
+      --color-sage-ink: 94, 107, 82;
+      --color-sand-ink: 122, 92, 70;
+      --color-sale: 180, 35, 24;
+      --color-in-stock: 31, 122, 77;
+      --color-line: 36, 36, 36;
+      --color-cta: 36, 36, 36;
+      --color-on-cta: 245, 242, 236;
     }
     &.dark-mode {
       --background-app-rgb: 20, 20, 20;
@@ -48,6 +64,17 @@
       --color-secondary-50: 17, 24, 39;
       --color-secondary-0: 24, 33, 47;
       --backdrop-color: 0, 0, 0;
+      --color-page: 26, 26, 26;
+      --color-surface: 36, 36, 36;
+      --color-ink: 245, 242, 236;
+      --color-muted: 181, 176, 168;
+      --color-sage-ink: 164, 173, 152;
+      --color-sand-ink: 217, 189, 167;
+      --color-sale: 240, 133, 122;
+      --color-in-stock: 108, 203, 151;
+      --color-line: 245, 242, 236;
+      --color-cta: 245, 242, 236;
+      --color-on-cta: 36, 36, 36;
     }
   }
 }
@@ -83,6 +110,11 @@
   .badge--error {
     @apply bg-rose-600 text-white;
   }
+  /* Storefront focus ring: ink on the page colour, so charcoal in light mode
+     and warm-white in dark mode. */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-page;
+  }
   .btnIcon {
     @apply w-6 h-6 text-primary-900;
   }
@@ -102,4 +134,20 @@ body {
   min-height: 100vh;
   user-select: none;
   background-color: var(--background-app-rgb);
+}
+
+/* Storefront only: shoppers can select and copy text. */
+body.storefront {
+  user-select: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storefront *,
+  .storefront *::before,
+  .storefront *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

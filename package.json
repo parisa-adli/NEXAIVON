@@ -9,7 +9,9 @@
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
     "start": "concurrently --kill-others-on-fail --names server,client --prefix-colors blue,magenta \"npm start --prefix server\" \"npm start --prefix client\"",
-    "test:server": "npm test --prefix server"
+    "test:server": "npm test --prefix server",
+    "check:scope": "node scripts/check-scope.mjs",
+    "test:scripts": "node --test \"scripts/*.test.mjs\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

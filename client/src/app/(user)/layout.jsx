@@ -1,4 +1,5 @@
 import vazirFont from "@/constants/localFonts";
+import interFont from "@/constants/latinFont";
 import "../globals.css";
 import Providers from "../Providers";
 import { Toaster } from "react-hot-toast";
@@ -13,7 +14,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fa" dir="rtl">
       <body
-        className={`${vazirFont.variable} font-sans bg-secondary-0 text-secondary-700`}
+        className={`${vazirFont.variable} ${interFont.variable} storefront font-sans text-body bg-page text-ink`}
       >
         <Providers>
           <Toaster />

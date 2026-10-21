@@ -29,7 +29,7 @@ const vazirFont = LocalFont({
   ],
   variable: "--font-vazir",
   style: "normal",
-  display: "block",
+  display: "swap",
 });
 
 export default vazirFont;
