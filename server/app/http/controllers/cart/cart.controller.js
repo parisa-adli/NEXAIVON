@@ -15,6 +15,9 @@ class CartController extends Controller {
     const { productId } = req.body;
     const addedProduct = await this.checkExistProduct(productId);
     const product = await this.findProductInCart(userId, productId);
+    const quantityInCart = product?.quantity ?? 0;
+    if (quantityInCart + 1 > addedProduct.countInStock)
+      throw createHttpError.BadRequest("موجودی این محصول کافی نیست");
 
     if (product) {
       const addToCartResult = await UserModel.updateOne(

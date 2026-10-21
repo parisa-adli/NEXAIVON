@@ -152,6 +152,7 @@ async function getUserCartDetail(userId) {
           price: 1,
           offPrice: 1,
           imageLink: 1,
+          countInStock: 1,
         },
       },
     },
@@ -185,14 +186,13 @@ async function getUserCartDetail(userId) {
         discountDetail: {
           $function: {
             body: function discountDetail(productDetail, coupon) {
-              if (!coupon)
-                return { newProductDetail: productDetail, coupon: null };
               const isExpiredCoupon =
-                coupon.expireDate &&
+                coupon?.expireDate &&
                 new Date(coupon.expireDate).getTime() < Date.now();
-              const isReachedLimit = coupon.usageCount >= coupon.usageLimit;
-              if (!coupon.isActive || isReachedLimit || isExpiredCoupon)
-                return null;
+              const isReachedLimit = coupon?.usageCount >= coupon?.usageLimit;
+              // A stale coupon is ignored, not an error (FR-API-15).
+              if (!coupon || !coupon.isActive || isReachedLimit || isExpiredCoupon)
+                return { newProductDetail: productDetail, coupon: null };
 
               const newProductDetail = productDetail.map((product) => {
                 if (product.discount) return product;

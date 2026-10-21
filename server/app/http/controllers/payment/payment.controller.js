@@ -17,6 +17,7 @@ class PaymentController extends Controller {
     const user = req.user;
     if (!user.cart?.products || user.cart?.products.length === 0)
       throw createHttpError.BadRequest("سبد خرید شما خالی میباشد");
+    await this.checkCartInStock(user.cart.products);
     const cart = (await getUserCartDetail(user._id))?.[0];
     if (!cart?.payDetail)
       throw createHttpError.BadRequest("مشخصات پرداخت یافت نشد");
@@ -71,6 +72,25 @@ class PaymentController extends Controller {
         message: "سفارش شما با موفقیت ثبت شد",
       },
     });
+  }
+  // Every line must still exist and fit in stock before anything is written
+  // (FR-API-01).
+  async checkCartInStock(cartProducts) {
+    const products = await ProductModel.find(
+      { _id: { $in: cartProducts.map((line) => line.productId) } },
+      { title: 1, countInStock: 1 }
+    );
+    for (const line of cartProducts) {
+      const product = products.find((p) => p._id.equals(line.productId));
+      if (!product)
+        throw createHttpError.BadRequest(
+          "یکی از محصولات سبد خرید دیگر موجود نیست"
+        );
+      if (line.quantity > product.countInStock)
+        throw createHttpError.BadRequest(
+          `موجودی ${product.title} کافی نیست`
+        );
+    }
   }
   async getListOfPayments(req, res) {
     const payments = await PaymentModel.find({}).populate([

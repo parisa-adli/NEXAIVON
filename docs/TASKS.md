@@ -30,7 +30,7 @@ Size: **S** ≈ ½ day, **M** ≈ 1–2 days, **L** ≈ 3–4 days.
 | ✅ S-07 | Safe category handling: whitelist `/category/list` keys; unknown `?category=` → `[]` | 03 §3.4, FR-API-06 | S | S-01 | AC-API-04, AC-API-05 |
 | ✅ S-08 | Optional auth treats an expired/invalid token as guest | 03 §3.6, R7 | S | S-01 | AC-API-09 |
 | ✅ S-09 | `limit` + `pagination` on `/product/list`; fix `sort=popular` | 03 §3.1, §3.3 (FR-API-03 P0, FR-API-05 popular) | M | S-01 | AC-API-01, 02, 03, 06 |
-| S-10 | Stock validation on `/cart/add` and `/payment/create`; `countInStock` in cart detail; null-coupon guard | 07 §3.1–3.3 (FR-API-01, 01b, 15) | M | S-01, S-04 | AC-CART-06, AC-CART-08, AC-PDP-05 (server half) |
+| ✅ S-10 | Stock validation on `/cart/add` and `/payment/create`; `countInStock` in cart detail; null-coupon guard | 07 §3.1–3.3 (FR-API-01, 01b, 15) | M | S-01, S-04 | AC-CART-06, AC-CART-08, AC-PDP-05 (server half) |
 | S-11 | Quantity-aware conditional stock decrement with compensation | 07 §3.4 (FR-API-16) | M | S-10 | AC-CART-07, 09, 10 |
 | **Phase C — P1** | | | | | |
 | S-12 | `page` + `exclude`, regex search, price sort, `minPrice`/`maxPrice`/`brand` | 03 §3.1–3.3 (FR-API-03..05) | M | S-09 | AC-API-07 + filter tests |
