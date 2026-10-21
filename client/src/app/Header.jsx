@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import AccountMenu from "@/components/ui/AccountMenu";
 import CartLink from "@/components/ui/CartLink";
 import MobileDrawer from "@/components/ui/MobileDrawer";
+import IconButton from "@/components/ui/IconButton";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { HiOutlineBars3 } from "react-icons/hi2";
@@ -31,16 +32,15 @@ function Header() {
         className="container flex h-16 items-center justify-between gap-x-2 xl:max-w-screen-xl"
       >
         <div className="flex items-center gap-x-1 sm:gap-x-8">
-          <button
-            type="button"
+          <IconButton
             onClick={() => setIsDrawerOpen(true)}
             aria-expanded={isDrawerOpen}
-            aria-controls="header-drawer"
-            aria-label="باز کردن منو"
-            className="focus-ring flex h-10 w-10 items-center justify-center rounded-pill text-ink transition-colors duration-200 hover:bg-ink/5 sm:hidden"
+            aria-controls={isDrawerOpen ? "header-drawer" : undefined}
+            label="باز کردن منو"
+            className="sm:hidden"
           >
             <HiOutlineBars3 className="h-6 w-6" aria-hidden="true" />
-          </button>
+          </IconButton>
           <Link
             className="focus-ring flex items-center rounded-card px-1 py-2"
             href="/"
@@ -48,7 +48,7 @@ function Header() {
             <Wordmark className="text-base sm:text-lg" />
           </Link>
           <Link
-            className="focus-ring hidden rounded-pill px-3 py-2 text-small font-bold text-muted transition-colors duration-200 hover:text-ink sm:block"
+            className="focus-ring hidden rounded-pill px-3 py-2 text-small font-bold text-muted transition-colors duration-200 hover:text-ink active:text-ink sm:block"
             href="/products"
           >
             محصولات
@@ -59,13 +59,13 @@ function Header() {
           {isLoading ? (
             <span
               aria-hidden="true"
-              className="h-10 w-10 rounded-pill bg-ink/10 motion-safe:animate-pulse"
+              className="h-11 w-11 rounded-pill bg-ink/10 motion-safe:animate-pulse"
             />
           ) : user ? (
             <AccountMenu user={user} onLogout={logoutHandler} />
           ) : (
             <Link
-              className="focus-ring flex h-10 items-center gap-x-1.5 rounded-pill bg-cta px-4 text-small font-bold text-on-cta transition-colors duration-200 hover:bg-cta/90"
+              className="focus-ring flex h-11 items-center gap-x-1.5 rounded-pill bg-cta px-4 text-small font-bold text-on-cta transition-colors duration-200 hover:bg-cta/90 active:bg-cta/80"
               href="/auth"
             >
               <span>ورود</span>
@@ -73,9 +73,8 @@ function Header() {
             </Link>
           )}
           <CartLink
-            count={
-              isLoading ? null : cart ? cart.payDetail.productIds.length : 0
-            }
+            count={cart ? cart.payDetail.productIds.length : 0}
+            isLoading={isLoading}
           />
         </div>
       </nav>
@@ -88,7 +87,7 @@ function Header() {
         <ul className="flex flex-col gap-y-1">
           <li>
             <Link
-              className="focus-ring block rounded-card px-3 py-3 text-body font-bold text-ink transition-colors duration-200 hover:bg-ink/5"
+              className="focus-ring block rounded-card px-3 py-3 text-body font-bold text-ink transition-colors duration-200 hover:bg-ink/5 active:bg-ink/10"
               href="/products"
               onClick={closeDrawer}
             >

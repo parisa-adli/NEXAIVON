@@ -8,7 +8,7 @@ import useOutsideClick from "@/hooks/useOutsideClick";
 
 // Storefront equivalent of the shared account dropdown: same entries, the
 // logout handler comes from the caller. Opens locally; closes on outside
-// click, on Escape and when an entry is chosen.
+// click, on Escape, when focus leaves it and when an entry is chosen.
 function AccountMenu({ user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef(null);
@@ -22,19 +22,30 @@ function AccountMenu({ user, onLogout }) {
     }
   };
 
+  // Only when focus lands elsewhere: Safari leaves `relatedTarget` empty on a
+  // click, and closing then would swallow the click on an entry.
+  const handleBlur = (e) => {
+    if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) close();
+  };
+
   const itemClass =
-    "focus-ring flex w-full items-center gap-x-3 rounded-card px-3 py-2.5 text-small text-ink transition-colors duration-200 hover:bg-ink/5";
+    "focus-ring flex w-full items-center gap-x-3 rounded-card px-3 py-2.5 text-small text-ink transition-colors duration-200 hover:bg-ink/5 active:bg-ink/10";
 
   return (
-    <div ref={ref} className="relative" onKeyDown={handleKeyDown}>
+    <div
+      ref={ref}
+      className="relative"
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+    >
       <button
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
-        aria-controls="account-menu"
+        aria-controls={isOpen ? "account-menu" : undefined}
         aria-label="حساب کاربری"
-        className="focus-ring flex h-10 w-10 items-center justify-center rounded-pill bg-sage/30 text-sage-ink transition-colors duration-200 hover:bg-sage/50"
+        className="focus-ring flex h-11 w-11 items-center justify-center rounded-pill bg-sage/30 text-sage-ink transition-colors duration-200 hover:bg-sage/50 active:bg-sage/60"
       >
         <FaUserAlt className="h-4 w-4" aria-hidden="true" />
       </button>
