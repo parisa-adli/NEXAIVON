@@ -8,7 +8,8 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
-    "start": "concurrently --kill-others-on-fail --names server,client --prefix-colors blue,magenta \"npm start --prefix server\" \"npm start --prefix client\""
+    "start": "concurrently --kill-others-on-fail --names server,client --prefix-colors blue,magenta \"npm start --prefix server\" \"npm start --prefix client\"",
+    "test:server": "npm test --prefix server"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
