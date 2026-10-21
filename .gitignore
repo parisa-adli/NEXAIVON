@@ -22,3 +22,6 @@ Thumbs.db
 *.pem
 .vercel
 .netlify
+
+# server uploads (admin uploads and seed image copies)
+server/uploads/

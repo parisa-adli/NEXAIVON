@@ -2,6 +2,7 @@ import { createRequire } from "node:module";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { setupTestDb } from "./helpers/db.js";
+import { loggedCode } from "./helpers/otp.js";
 
 // Server code is CommonJS: load it with Node's require (see helpers/db.js).
 const require = createRequire(import.meta.url);
@@ -14,17 +15,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
 });
-
-// Returns the OTP the server logged for phoneNumber, or undefined.
-function loggedCode(logSpy, phoneNumber) {
-  for (const args of logSpy.mock.calls) {
-    const line = args.join(" ");
-    if (!line.includes(phoneNumber)) continue;
-    const match = line.match(/\b\d{6}\b/);
-    if (match) return match[0];
-  }
-  return undefined;
-}
 
 describe("POST /api/user/get-otp outside production", () => {
   it("logs the code instead of calling Kavenegar, and the logged code verifies", async () => {
