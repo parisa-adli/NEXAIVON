@@ -1,0 +1,32 @@
+/* PROTOTYPE: sub-PRD 01 palette, scoped to the prototype only so globals.css stays untouched. */
+.proto-scope {
+  --p-bg: 245 242 236; /* warm-white */
+  --p-surface: 251 249 245;
+  --p-ink: 36 36 36; /* charcoal */
+  --p-muted: 92 92 92;
+  --p-sage: 164 173 152;
+  --p-sand: 217 189 167;
+  --p-sage-ink: 94 107 82;
+  --p-sand-ink: 122 92 70;
+  --p-sale: 180 35 24;
+  --p-in-stock: 31 122 77;
+  --p-line: 36 36 36;
+  --p-cta: 36 36 36;
+  --p-on-cta: 245 242 236;
+}
+
+.dark-mode .proto-scope {
+  --p-bg: 26 26 26;
+  --p-surface: 36 36 36;
+  --p-ink: 245 242 236;
+  --p-muted: 181 176 168;
+  --p-sage: 164 173 152;
+  --p-sand: 217 189 167;
+  --p-sage-ink: 164 173 152;
+  --p-sand-ink: 217 189 167;
+  --p-sale: 240 133 122;
+  --p-in-stock: 108 203 151;
+  --p-line: 245 242 236;
+  --p-cta: 245 242 236;
+  --p-on-cta: 36 36 36;
+}

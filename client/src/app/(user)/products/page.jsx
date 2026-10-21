@@ -10,6 +10,10 @@ import { cookies } from "next/headers";
 import { toStringCookies } from "@/utils/toStringCookies";
 import Image from "next/image";
 import { toPersianNumbersWithComma } from "@/utils/toPersianNumber";
+import PrototypeSwitcher from "@/components/prototype/PrototypeSwitcher";
+import ProductCardPrototype, {
+  VARIANT_NAMES,
+} from "./_prototype/ProductCardPrototype";
 
 export const dynamic = "force-dynamic"; // eq to { cache: 'no-store'} or SSR in page
 
@@ -21,8 +25,10 @@ async function ProductsPage({ searchParams }) {
 
   const cookieStore = await cookies();
   const strCookies = await toStringCookies(cookieStore);
+  // PROTOTYPE: `variant` picks a card prototype and must not reach the API.
+  const { variant, ...apiParams } = await searchParams;
   const productPromise = getProducts(
-    queryString.stringify(await searchParams),
+    queryString.stringify(apiParams),
     strCookies
   );
   const categoryPromise = getCategories();
@@ -37,6 +43,14 @@ async function ProductsPage({ searchParams }) {
       <div className="flex flex-col sm:flex-row gap-y-8 sm:gap-0">
         <CategorySidebar categories={categories} />
         <div className="flex-1">
+          {/* PROTOTYPE: product card variants */}
+          <PrototypeSwitcher
+            variants={["current", "A", "B", "C"]}
+            names={VARIANT_NAMES}
+          />
+          {variant && variant !== "current" ? (
+            <ProductCardPrototype products={products} variant={variant} />
+          ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
               <div
@@ -68,6 +82,7 @@ async function ProductsPage({ searchParams }) {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
     </div>
