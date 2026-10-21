@@ -18,13 +18,13 @@ const PROTECTED = [
 
 // New Storefront presentational components live here, inside an otherwise
 // protected folder.
-const ALLOWED = ["client/src/components/ui/"];
+const PROTECTED_EXCEPTIONS = ["client/src/components/ui/"];
 
 export function findProtectedChanges(paths) {
   return paths.filter(
     (path) =>
       PROTECTED.some((prefix) => path.startsWith(prefix)) &&
-      !ALLOWED.some((prefix) => path.startsWith(prefix))
+      !PROTECTED_EXCEPTIONS.some((prefix) => path.startsWith(prefix))
   );
 }
 
