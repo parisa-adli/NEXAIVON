@@ -22,21 +22,29 @@ class PaymentController extends Controller {
     if (!cart?.payDetail)
       throw createHttpError.BadRequest("مشخصات پرداخت یافت نشد");
 
+    await this.decrementStock(user.cart.products);
+
     const amount = parseInt(cart?.payDetail?.totalPrice);
     const description = cart?.payDetail?.description;
 
     // create verified Course
-    await PaymentModel.create({
-      invoiceNumber: invoiceNumberGenerator(),
-      paymentDate: moment().format("jYYYYjMMjDDHHmmss"),
-      amount,
-      user: user._id,
-      description,
-      authority: secretKeyGenerator(),
-      status: "COMPLETED",
-      isPaid: true,
-      cart,
-    });
+    try {
+      await PaymentModel.create({
+        invoiceNumber: invoiceNumberGenerator(),
+        paymentDate: moment().format("jYYYYjMMjDDHHmmss"),
+        amount,
+        user: user._id,
+        description,
+        authority: secretKeyGenerator(),
+        status: "COMPLETED",
+        isPaid: true,
+        cart,
+      });
+    } catch (error) {
+      // No payment means no order: give the stock back.
+      await this.restoreStock(user.cart.products);
+      throw error;
+    }
     // add course to the use enrolledCourses
     await UserModel.updateOne(
       { _id: user._id },
@@ -50,13 +58,6 @@ class PaymentController extends Controller {
       }
     );
 
-    // decrease products inStock :
-    await ProductModel.updateMany(
-      { _id: { $in: cart?.payDetail?.productIds } },
-      {
-        $inc: { countInStock: -1 },
-      }
-    );
     // update Coupon
     if (cart?.coupon)
       await CouponModel.updateOne(
@@ -90,6 +91,34 @@ class PaymentController extends Controller {
         throw createHttpError.BadRequest(
           `موجودی ${product.title} کافی نیست`
         );
+    }
+  }
+  // Takes each line's quantity out of stock, only while enough is left, so
+  // countInStock never goes below 0 (FR-API-16). If a line no longer fits
+  // (another order took the stock after checkCartInStock), the lines already
+  // taken are given back and the order fails.
+  async decrementStock(cartProducts) {
+    const decremented = [];
+    for (const line of cartProducts) {
+      const result = await ProductModel.updateOne(
+        { _id: line.productId, countInStock: { $gte: line.quantity } },
+        { $inc: { countInStock: -line.quantity } }
+      );
+      if (result.modifiedCount === 0) {
+        await this.restoreStock(decremented);
+        throw createHttpError.BadRequest(
+          "موجودی یکی از محصولات سبد خرید کافی نیست"
+        );
+      }
+      decremented.push(line);
+    }
+  }
+  async restoreStock(cartProducts) {
+    for (const line of cartProducts) {
+      await ProductModel.updateOne(
+        { _id: line.productId },
+        { $inc: { countInStock: line.quantity } }
+      );
     }
   }
   async getListOfPayments(req, res) {

@@ -225,3 +225,70 @@ describe("POST /api/payment/create stock check", () => {
     expect(await PaymentModel.countDocuments()).toBe(1);
   });
 });
+
+describe("POST /api/payment/create stock decrement", () => {
+  it("decrements each product by its ordered quantity", async () => {
+    const pair = await createProduct({ countInStock: 5 });
+    const single = await createProduct({ countInStock: 3 });
+    const user = await createUserWithCart([
+      [pair, 2],
+      [single, 1],
+    ]);
+
+    const res = await createPayment(user);
+
+    expect(res.status).toBe(200);
+    expect((await ProductModel.findById(pair._id)).countInStock).toBe(3);
+    expect((await ProductModel.findById(single._id)).countInStock).toBe(2);
+  });
+
+  it("lets exactly one of two concurrent orders take the last unit", async () => {
+    const last = await createProduct({ countInStock: 1 });
+    const first = await createUserWithCart([[last, 1]]);
+    const second = await createUserWithCart([[last, 1]]);
+
+    const results = await Promise.all([
+      createPayment(first),
+      createPayment(second),
+    ]);
+
+    expect(results.map((r) => r.status).sort()).toEqual([200, 400]);
+    expect(await PaymentModel.countDocuments()).toBe(1);
+    expect((await ProductModel.findById(last._id)).countInStock).toBe(0);
+  });
+
+  it("gives back the other lines of an order that lost the race", async () => {
+    const plenty = await createProduct({ countInStock: 5 });
+    const last = await createProduct({ countInStock: 1 });
+    const first = await createUserWithCart([
+      [plenty, 1],
+      [last, 1],
+    ]);
+    const second = await createUserWithCart([
+      [plenty, 1],
+      [last, 1],
+    ]);
+
+    const results = await Promise.all([
+      createPayment(first),
+      createPayment(second),
+    ]);
+
+    expect(results.map((r) => r.status).sort()).toEqual([200, 400]);
+    expect((await ProductModel.findById(plenty._id)).countInStock).toBe(4);
+    expect((await ProductModel.findById(last._id)).countInStock).toBe(0);
+  });
+
+  it("still records a COMPLETED payment and empties the cart", async () => {
+    const product = await createProduct({ countInStock: 5 });
+    const user = await createUserWithCart([[product, 2]]);
+
+    const res = await createPayment(user);
+
+    expect(res.status).toBe(200);
+    const payment = await PaymentModel.findOne({ user: user._id });
+    expect(payment).toMatchObject({ status: "COMPLETED", isPaid: true });
+    const saved = await UserModel.findById(user._id);
+    expect(saved.cart.products).toHaveLength(0);
+  });
+});
