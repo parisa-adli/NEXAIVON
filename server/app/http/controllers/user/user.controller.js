@@ -22,11 +22,6 @@ const {
 const { PaymentModel } = require("../../../models/payment");
 
 class userAuthController extends Controller {
-  constructor() {
-    super();
-    this.code = 0;
-    this.phoneNumber = null;
-  }
   async getOtp(req, res) {
     let { phoneNumber } = req.body;
 
@@ -34,14 +29,14 @@ class userAuthController extends Controller {
       throw createError.BadRequest("شماره موبایل معتبر را وارد کنید");
 
     phoneNumber = phoneNumber.trim();
-    this.phoneNumber = phoneNumber;
-    this.code = generateRandomNumber(6);
+    // Request-local: the controller is a singleton shared by concurrent requests.
+    const code = generateRandomNumber(6);
 
-    const result = await this.saveUser(phoneNumber);
+    const result = await this.saveUser(phoneNumber, code);
     if (!result) throw createError.Unauthorized("ورود شما انجام نشد.");
 
     // send OTP
-    this.sendOTP(phoneNumber, res);
+    this.sendOTP(phoneNumber, code, res);
   }
   async checkOtp(req, res) {
     await checkOtpSchema.validateAsync(req.body);
@@ -98,9 +93,9 @@ class userAuthController extends Controller {
       },
     });
   }
-  async saveUser(phoneNumber) {
+  async saveUser(phoneNumber, code) {
     const otp = {
-      code: this.code,
+      code,
       expiresIn: Date.now() + CODE_EXPIRES,
     };
 
@@ -128,29 +123,26 @@ class userAuthController extends Controller {
     );
     return !!updatedResult.modifiedCount;
   }
-  sendOTP(phoneNumber, res) {
+  sendOTP(phoneNumber, code, res) {
+    // Outside production the code goes to the server log, never to Kavenegar.
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[dev OTP] ${phoneNumber}: ${code}`);
+      return this.respondOtpSent(phoneNumber, res);
+    }
+
     const kaveNegarApi = Kavenegar.KavenegarApi({
       apikey: `${process.env.KAVENEGAR_API_KEY}`,
     });
     kaveNegarApi.VerifyLookup(
       {
         receptor: phoneNumber,
-        token: this.code,
+        token: code,
         template: "registerVerify",
       },
       (response, status) => {
         console.log("kavenegar message status", status);
         if (response && status === 200)
-          return res.status(HttpStatus.OK).send({
-            statusCode: HttpStatus.OK,
-            data: {
-              message: `کد تائید برای شماره موبایل ${toPersianDigits(
-                phoneNumber
-              )} ارسال گردید`,
-              expiresIn: CODE_EXPIRES,
-              phoneNumber,
-            },
-          });
+          return this.respondOtpSent(phoneNumber, res);
 
         return res.status(status).send({
           statusCode: status,
@@ -158,6 +150,18 @@ class userAuthController extends Controller {
         });
       }
     );
+  }
+  respondOtpSent(phoneNumber, res) {
+    return res.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      data: {
+        message: `کد تائید برای شماره موبایل ${toPersianDigits(
+          phoneNumber
+        )} ارسال گردید`,
+        expiresIn: CODE_EXPIRES,
+        phoneNumber,
+      },
+    });
   }
   async completeProfile(req, res) {
     await completeProfileSchema.validateAsync(req.body);
