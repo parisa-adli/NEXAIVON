@@ -21,7 +21,7 @@ export const VARIANT_NAMES = {
   C: "Editorial overlay",
 };
 
-const c = {
+export const c = {
   bg: "bg-[rgb(var(--p-bg))]",
   surface: "bg-[rgb(var(--p-surface))]",
   ink: "text-[rgb(var(--p-ink))]",
@@ -99,7 +99,7 @@ function LikeStub({ product, className = "" }) {
 // ---------------------------------------------------------------- Variant A
 // Gallery: image is the hero on a tinted panel, text sits below with no box,
 // full-width pill CTA. Reads like a boutique catalogue.
-function CardA({ product }) {
+export function CardA({ product }) {
   const stock = stockOf(product);
   return (
     <article className="flex flex-col">
