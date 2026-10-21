@@ -15,6 +15,7 @@ const { ProductModel } = require("../../../../models/product");
 const {
   addProductSchema,
   changeCourseDiscountSchema,
+  productListQuerySchema,
 } = require("../../../validators/admin/product.schema");
 
 class ProductController extends Controller {
@@ -60,6 +61,7 @@ class ProductController extends Controller {
   async getListOfProducts(req, res) {
     let dbQuery = {};
     const user = req.user;
+    const { limit } = await productListQuerySchema.validateAsync(req.query);
     const { search, category, sort, type } = req.query;
     // console.log({ category, sort, type });
     if (search) dbQuery["$text"] = { $search: search };
@@ -77,19 +79,40 @@ class ProductController extends Controller {
       };
     }
 
-    const sortQuery = {};
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-      if (sort === "popular") sortQuery["likes"] = -1;
-    }
+    // Unknown (or repeated) sort values fall back to the default, oldest
+    // first. `_id` breaks ties so `limit` cuts the list at a stable place.
+    const sortQuery = { createdAt: sort === "latest" ? -1 : 1, _id: 1 };
 
-    const products = await ProductModel.find(dbQuery, {
-      reviews: 0,
-    })
-      .populate([{ path: "category", select: { title: 1, englishTitle: 1 } }])
-      .sort(sortQuery);
+    const populateCategory = [
+      { path: "category", select: { title: 1, englishTitle: 1 } },
+    ];
+    let loadProducts;
+    if (sort === "popular") {
+      // Sorting on `likes` directly orders by array element value, not by
+      // length, so sort on the like count instead (FR-API-05).
+      const pipeline = [
+        { $match: dbQuery },
+        { $addFields: { likesCount: { $size: { $ifNull: ["$likes", []] } } } },
+        { $sort: { likesCount: -1, createdAt: -1, _id: 1 } },
+        ...(limit ? [{ $limit: limit }] : []),
+        { $project: { reviews: 0, likesCount: 0 } },
+      ];
+      loadProducts = ProductModel.aggregate(pipeline).then((docs) => {
+        const hydrated = docs.map((doc) => ProductModel.hydrate(doc));
+        return ProductModel.populate(hydrated, populateCategory);
+      });
+    } else {
+      loadProducts = ProductModel.find(dbQuery, {
+        reviews: 0,
+      })
+        .populate(populateCategory)
+        .sort(sortQuery);
+      if (limit) loadProducts = loadProducts.limit(limit);
+    }
+    const [products, total] = await Promise.all([
+      loadProducts,
+      limit ? ProductModel.countDocuments(dbQuery) : null,
+    ]);
 
     const transformedProducts = copyObject(products);
 
@@ -111,6 +134,14 @@ class ProductController extends Controller {
       statusCode: HttpStatus.OK,
       data: {
         products: newProducts,
+        ...(limit && {
+          pagination: {
+            page: 1,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
+        }),
       },
     });
   }

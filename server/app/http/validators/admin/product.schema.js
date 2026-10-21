@@ -52,7 +52,18 @@ const changeCourseDiscountSchema = Joi.object({
     .error(createError.BadRequest("تخفیف وارد شده صحیح نمیباشد")),
 });
 
+// Only `limit` is checked; other /product/list params are read as before.
+// Omitting `limit` keeps the old "return everything" behaviour (FR-API-03).
+const productListQuerySchema = Joi.object({
+  limit: Joi.number()
+    .integer()
+    .min(1)
+    .max(48)
+    .error(createError.BadRequest("تعداد محصولات باید عددی بین ۱ تا ۴۸ باشد")),
+}).unknown(true);
+
 module.exports = {
   addProductSchema,
+  productListQuerySchema,
   changeCourseDiscountSchema,
 };
