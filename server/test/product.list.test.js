@@ -249,3 +249,49 @@ describe("GET /api/product/list?sort= (invalid)", () => {
     }
   );
 });
+
+describe("GET /api/product/list?search=", () => {
+  async function seedSearchable() {
+    const category = await CategoryModel.create({
+      title: "گوشی موبایل",
+      englishTitle: "smartphones",
+      description: "Phones",
+    });
+    const base = {
+      imageLink: "uploads/test.png",
+      price: 1000,
+      offPrice: 1000,
+      brand: "TestBrand",
+      countInStock: 5,
+      category: category._id,
+    };
+    await ProductModel.create([
+      { ...base, title: "Gaming Laptop", description: "Fast", slug: "laptop" },
+      { ...base, title: "Phone", description: "Has a laptop-grade chip", slug: "phone" },
+      { ...base, title: "Watch (v2.0)", description: "Smart", slug: "watch" },
+    ]);
+  }
+
+  const slugsFor = async (search) =>
+    (await request(createApp()).get(`/api/product/list?search=${search}`))
+      .body.data.products.map((p) => p.slug).sort();
+
+  it("matches partial words in title or description, ignoring case", async () => {
+    await seedSearchable();
+
+    expect(await slugsFor("LAPT")).toEqual(["laptop", "phone"]);
+  });
+
+  it("matches regex characters literally", async () => {
+    await seedSearchable();
+
+    expect(await slugsFor(encodeURIComponent("(v2.0)"))).toEqual(["watch"]);
+    expect(await slugsFor(encodeURIComponent(".*"))).toEqual([]);
+  });
+
+  it("ignores a query operator passed as search", async () => {
+    await seedSearchable();
+
+    expect(await slugsFor("[$ne]=x")).toEqual(["laptop", "phone", "watch"]);
+  });
+});

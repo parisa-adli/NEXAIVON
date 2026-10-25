@@ -26,6 +26,16 @@ export const navLinks = [
   { label: "لوازم جانبی", href: "/products?category=accessories" },
 ];
 
+export const searchTags = [
+  "آیفون",
+  "سامسونگ",
+  "ایرپاد",
+  "اپل واچ",
+  "هندزفری بلوتوث",
+  "پاوربانک",
+  "شارژر",
+];
+
 export const heroSlides = [
   {
     eyebrow: "تکنولوژی، همراه زندگی شما",

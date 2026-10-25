@@ -64,7 +64,15 @@ class ProductController extends Controller {
     const { limit } = await productListQuerySchema.validateAsync(req.query);
     const { search, category, sort, type } = req.query;
     // console.log({ category, sort, type });
-    if (search) dbQuery["$text"] = { $search: search };
+    // Partial, case-insensitive match. Input is escaped so it is matched
+    // literally; a non-string value (e.g. `search[$ne]=x`) is ignored.
+    if (typeof search === "string" && search.trim()) {
+      const term = new RegExp(
+        search.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        "i"
+      );
+      dbQuery["$or"] = [{ title: term }, { description: term }];
+    }
     if (category) {
       // Unknown englishTitles are ignored; if none match, the $in is empty
       // and the list comes back empty. A non-string value (e.g. a parsed
