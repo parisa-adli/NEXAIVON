@@ -59,6 +59,19 @@
       --backdrop-color: 0, 0, 0;
     }
   }
+  /* profile/admin panels: primary ramp = --color-brand mixed toward white; set on <body> so portals inherit it */
+  .theme-store {
+    --color-primary-900: 38, 78, 53;
+    --color-primary-800: 60, 96, 73;
+    --color-primary-700: 81, 113, 93;
+    --color-primary-600: 103, 131, 114;
+    --color-primary-500: 125, 149, 134;
+    --color-primary-400: 147, 167, 154;
+    --color-primary-300: 168, 184, 174;
+    --color-primary-200: 190, 202, 195;
+    --color-primary-100: 217, 224, 203;
+    --color-primary-50: 227, 232, 229;
+  }
 }
 
 @layer components {
