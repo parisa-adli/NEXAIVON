@@ -27,6 +27,8 @@ const UserSchema = new mongoose.Schema(
     resetLink: { type: String, default: null },
     isVerifiedPhoneNumber: { type: Boolean, default: false },
     isActive: { type: Boolean, default: false },
+    // Set by an admin to deactivate the account; isActive means "profile completed".
+    isBlocked: { type: Boolean, default: false },
     Products: [{ type: ObjectId, ref: "Product" }],
     role: { type: String, default: "USER" },
     cart: { type: CartSchema },

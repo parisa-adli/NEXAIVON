@@ -1,7 +1,7 @@
 import DragScroll from "@/common/DragScroll";
 import { userListTHeads } from "@/constants/tableHeads";
 import { toLocalDateStringShort } from "@/utils/toLocalDate";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa6";
 
@@ -43,6 +43,19 @@ function UsersTable({ users }) {
               </td>
               <td className="table__td">
                 {toLocalDateStringShort(user.createdAt)}
+              </td>
+              <td className="table__td">
+                {user.isBlocked ? (
+                  <span className="badge badge--error inline-flex items-center gap-x-1">
+                    <FaTimesCircle className="w-4 h-4" aria-hidden />
+                    غیرفعال
+                  </span>
+                ) : (
+                  <span className="badge badge--success inline-flex items-center gap-x-1">
+                    <FaCheckCircle className="w-4 h-4" aria-hidden />
+                    فعال
+                  </span>
+                )}
               </td>
               <td className="table__td">
                 <Link

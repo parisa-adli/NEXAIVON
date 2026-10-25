@@ -1,10 +1,15 @@
 "use client";
 
 import Loading from "@/common/Loading";
-import { useGetAllUsers } from "@/hooks/useAuth";
+import { useGetAllUsers, useUpdateUserByAdmin } from "@/hooks/useAuth";
 import { useParams } from "next/navigation";
 import { toLocalDateString } from "@/utils/toLocalDate";
 import TextFieldDetail from "@/common/TextFieldDetail";
+import RadioInput from "@/common/RadioInput";
+import Button from "@/common/Button";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const userFormData = [
   {
@@ -27,11 +32,6 @@ const userFormData = [
     label: "شماره موبایل",
     name: "phoneNumber",
   },
-  {
-    id: 5,
-    label: "سطح دسترسی کاربر",
-    name: "role",
-  },
 ];
 
 function UserPage() {
@@ -39,19 +39,76 @@ function UserPage() {
   const { isLoading, data } = useGetAllUsers();
   const { users } = data || {};
   const selectedUser = users && users.find((user) => user._id === id);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [role, setRole] = useState("USER");
+  const { isPending, mutateAsync } = useUpdateUserByAdmin();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (selectedUser) {
+      setIsBlocked(!!selectedUser.isBlocked);
+      setRole(selectedUser.role);
+    }
+  }, [selectedUser]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { message } = await mutateAsync({
+        id: selectedUser._id,
+        data: { isBlocked, role },
+      });
+      toast.success(message);
+      queryClient.invalidateQueries({ queryKey: ["get-users"] });
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  };
 
   if (isLoading) return <Loading />;
   return (
-    <div className="space-y-4 max-w-lg">
+    <form className="space-y-4 max-w-lg" onSubmit={handleSubmit}>
       <h1 className="font-bold text-lg mb-8 border-b pb-4">مشخصات کاربر</h1>
       <div className="grid grid-cols-3 gap-x-4">
         <span className="block mb-2 col-span-1">وضعیت کاربر</span>
-        <div className="textField__input !max-w-sm col-span-2">
-          {selectedUser.isActive ? (
-            <span className="badge badge--success">فعال</span>
-          ) : (
-            <span className="badge badge--error">غیر فعال</span>
-          )}
+        <div className="flex items-center gap-x-8 col-span-2">
+          <RadioInput
+            checked={!isBlocked}
+            id="status-active"
+            name="isBlocked"
+            label="فعال"
+            value="active"
+            onChange={() => setIsBlocked(false)}
+          />
+          <RadioInput
+            checked={isBlocked}
+            id="status-inactive"
+            name="isBlocked"
+            label="غیر فعال"
+            value="inactive"
+            onChange={() => setIsBlocked(true)}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-x-4">
+        <span className="block mb-2 col-span-1">سطح دسترسی کاربر</span>
+        <div className="flex items-center gap-x-8 col-span-2">
+          <RadioInput
+            checked={role === "USER"}
+            id="role-user"
+            name="role"
+            label="کاربر"
+            value="USER"
+            onChange={(e) => setRole(e.target.value)}
+          />
+          <RadioInput
+            checked={role === "ADMIN"}
+            id="role-admin"
+            name="role"
+            label="ادمین"
+            value="ADMIN"
+            onChange={(e) => setRole(e.target.value)}
+          />
         </div>
       </div>
       {userFormData.map((item) => (
@@ -88,7 +145,12 @@ function UserPage() {
           disabled
         />
       </div>
-    </div>
+      {isPending ? (
+        <Loading width="45" height="15" />
+      ) : (
+        <Button>ذخیره تغییرات</Button>
+      )}
+    </form>
   );
 }
 export default UserPage;
