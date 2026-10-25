@@ -1,12 +1,9 @@
 import {
-  LuCable,
-  LuCamera,
   LuCreditCard,
   LuHeadphones,
   LuHeadset,
   LuShieldCheck,
   LuSmartphone,
-  LuTablet,
   LuTruck,
   LuWatch,
 } from "react-icons/lu";
@@ -19,14 +16,14 @@ import {
   SiXiaomi,
 } from "react-icons/si";
 
-// shortcut: category links all point to /products, link real category slugs once the nav set is decided (design.md §10.1)
+// category values are Category.englishTitle, the key the products filter reads
 export const navLinks = [
   { label: "صفحه اصلی", href: "/" },
-  { label: "موبایل", href: "/products" },
-  { label: "هدفون و هندزفری", href: "/products" },
-  { label: "ساعت هوشمند", href: "/products" },
-  { label: "گجت‌های دیجیتال", href: "/products" },
-  { label: "لوازم جانبی", href: "/products" },
+  { label: "موبایل", href: "/products?category=smartphones" },
+  { label: "هدفون و هندزفری", href: "/products?category=headphones" },
+  { label: "ساعت هوشمند", href: "/products?category=smartwatches" },
+  { label: "گجت‌های دیجیتال", href: "/products?category=gadgets" },
+  { label: "لوازم جانبی", href: "/products?category=accessories" },
 ];
 
 export const heroSlides = [
@@ -50,14 +47,13 @@ export const heroSlides = [
   },
 ];
 
-// shortcut: icons stand in for product photos, swap for images when assets exist
 export const homeCategories = [
-  { label: "موبایل", href: "/products", icon: LuSmartphone },
-  { label: "تبلت", href: "/products", icon: LuTablet },
-  { label: "هدفون و هندزفری", href: "/products", icon: LuHeadphones },
-  { label: "ساعت هوشمند", href: "/products", icon: LuWatch },
-  { label: "گجت‌های دیجیتال", href: "/products", icon: LuCamera },
-  { label: "لوازم جانبی", href: "/products", icon: LuCable },
+  { label: "موبایل", category: "smartphones", image: "/category/mobile.png" },
+  { label: "تبلت", category: "tablets", image: "/category/tablet.webp" },
+  { label: "هدفون و هندزفری", category: "headphones", image: "/category/headphone.png" },
+  { label: "ساعت هوشمند", category: "smartwatches", image: "/category/smart-watch.png" },
+  { label: "گجت‌های دیجیتال", category: "gadgets", image: "/category/gadgets.png" },
+  { label: "لوازم جانبی", category: "accessories", image: "/category/charger.png" },
 ];
 
 export const promos = [
@@ -65,23 +61,24 @@ export const promos = [
     chip: "ساعت‌های هوشمند",
     title: "سبک زندگی هوشمند",
     subtitle: "مدل‌های جدید با امکانات پیشرفته",
-    icon: LuWatch,
+    image: "/category/smart-watch.png",
     dark: true,
   },
   {
     chip: "هدفون و هندزفری",
     title: "صدای شفاف، تجربه بهتر",
     subtitle: "با بهترین برندها و کیفیت عالی",
-    icon: LuHeadphones,
+    image: "/category/headphone.png",
     dark: false,
   },
 ];
 
 export const brands = [
   { name: "Apple", icon: SiApple },
-  { name: "Samsung", icon: SiSamsung },
+  // wide: wordmark glyphs that render thin in a square icon box
+  { name: "Samsung", icon: SiSamsung, wide: true },
   { name: "Xiaomi", icon: SiXiaomi },
-  { name: "Sony", icon: SiSony },
+  { name: "Sony", icon: SiSony, wide: true },
   { name: "JBL", icon: SiJbl },
   { name: "Huawei", icon: SiHuawei },
   // no Anker glyph in react-icons, rendered as a wordmark
