@@ -1,7 +1,6 @@
 import DragScroll from "@/common/DragScroll";
 import { couponListTHeads } from "@/constants/tableHeads";
 import Link from "next/link";
-import { FaEye } from "react-icons/fa";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { FiEdit3 } from "react-icons/fi";
 import { toLocalDateStringShort } from "@/utils/toLocalDate";
@@ -80,9 +79,6 @@ function CouponsTable({ coupons }) {
                 </td>
                 <td className="table__td">
                   <div className="flex items-center gap-x-2">
-                    <Link href={`/admin/coupons/${coupon._id}`}>
-                      <FaEye className="w-5 h-5 text-primary-900" />
-                    </Link>
                     <Link href={`/admin/coupons/edit/${coupon._id}`}>
                       <FiEdit3 className="w-5 h-5 text-secondary-600" />
                     </Link>
