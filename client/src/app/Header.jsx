@@ -115,7 +115,7 @@ function Header() {
         <nav className="hidden md:block container xl:max-w-screen-xl overflow-x-auto">
           <ul className="flex md:justify-center gap-x-8 text-sm font-medium whitespace-nowrap">
             {navLinks.map((link) => {
-              const isActive = link.href === "/" && pathname === "/";
+              const isActive = link.href === pathname;
               return (
                 <li key={link.label}>
                   <Link

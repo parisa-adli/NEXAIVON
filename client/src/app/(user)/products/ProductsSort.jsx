@@ -33,6 +33,7 @@ function ProductsSort() {
     (name, value) => {
       const params = new URLSearchParams(searchParams.toString());
       params.set(name, value);
+      params.delete("page");
       return params.toString();
     },
     [searchParams]

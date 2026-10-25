@@ -19,6 +19,7 @@ import {
 // category values are Category.englishTitle, the key the products filter reads
 export const navLinks = [
   { label: "صفحه اصلی", href: "/" },
+  { label: "محصولات", href: "/products" },
   { label: "موبایل", href: "/products?category=smartphones" },
   { label: "هدفون و هندزفری", href: "/products?category=headphones" },
   { label: "ساعت هوشمند", href: "/products?category=smartwatches" },

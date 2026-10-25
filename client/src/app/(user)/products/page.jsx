@@ -2,71 +2,78 @@ import { getCategories } from "@/services/categoryService";
 import { getProducts } from "@/services/productService";
 import CategorySidebar from "./CategorySidebar";
 import queryString from "query-string";
-import { toLocalDateStringShort } from "@/utils/toLocalDate";
-import Link from "next/link";
-import AddToCart from "./[slug]/AddToCart";
-import LikeProduct from "./LikeProduct";
 import { cookies } from "next/headers";
 import { toStringCookies } from "@/utils/toStringCookies";
-import Image from "next/image";
-import { toPersianNumbersWithComma } from "@/utils/toPersianNumber";
+import { toPersianNumbers } from "@/utils/toPersianNumber";
+import BreadCrumbs from "@/common/BreadCrumbs";
+import ProductCard from "../_components/ProductCard";
+import Pagination from "./Pagination";
 
 export const dynamic = "force-dynamic"; // eq to { cache: 'no-store'} or SSR in page
 
+const PAGE_SIZE = 12;
+
 async function ProductsPage({ searchParams }) {
-  // const { products } = await getProducts(
-  //   await queryString.stringify(searchParams)
-  // );
-  // const { categories } = await getCategories();
+  const params = await searchParams;
+  // a bad ?page= would make the API answer 400; fall back to the first page
+  const page = Math.max(1, Number.parseInt(params.page) || 1);
 
   const cookieStore = await cookies();
   const strCookies = await toStringCookies(cookieStore);
   const productPromise = getProducts(
-    queryString.stringify(await searchParams),
-    strCookies
+    queryString.stringify({ ...params, page, limit: PAGE_SIZE }),
+    strCookies,
   );
   const categoryPromise = getCategories();
-  const [{ products }, { categories }] = await Promise.all([
+  const [{ products, pagination }, { categories }] = await Promise.all([
     productPromise,
     categoryPromise,
   ]);
 
   return (
-    <div className="px-4">
-      <h1 className="text-xl font-bold mb-6">صفحه محصولات</h1>
-      <div className="flex flex-col sm:flex-row gap-y-8 sm:gap-0">
+    <div className="px-4 space-y-8">
+      <section className="rounded-xl bg-secondary-100 p-6 md:p-10">
+        <BreadCrumbs
+          breadcrumbs={[
+            { label: "خانه", href: "/" },
+            { label: "محصولات", href: "/products", active: true },
+          ]}
+        />
+        <h1 className="text-2xl md:text-4xl font-black text-secondary-900 mb-3">
+          محصولات
+        </h1>
+        <p className="text-secondary-600">
+          جدیدترین موبایل‌ها، گجت‌های هوشمند و لوازم جانبی با بهترین قیمت
+        </p>
+      </section>
+      <div className="flex flex-col sm:flex-row gap-8">
         <CategorySidebar categories={categories} />
-        <div className="flex-1">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((product) => (
-              <div
-                className="border rounded-xl shadow-md p-4 space-y-4 "
-                key={product._id}
-              >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-lg ">
-                  <Image
-                    src={product.imageLink}
-                    alt={product.title}
-                    fill
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <Link
-                  className="block font-bold"
-                  href={`/products/${product.slug}`}
-                >
-                  {product.title}
-                </Link>
-                <div className="flex items-center justify-between">
-                  <LikeProduct product={product} />
-                  <div className="flex items-center gap-x-1 text-lg">
-                    <p>{toPersianNumbersWithComma(product.price)}</p>
-                    <span className="text-xs">تومان</span>
-                  </div>
-                </div>
-                <AddToCart product={product} />
-              </div>
-            ))}
+        <div className="flex-1 space-y-6">
+          <p className="text-sm text-secondary-700">
+            {toPersianNumbers(pagination.total)} محصول
+          </p>
+          {products.length ? (
+            <div className="grid gap-6 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  showRating={false}
+                  showLike
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="py-16 text-center text-secondary-500">
+              محصولی یافت نشد.
+            </p>
+          )}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Pagination pagination={pagination} searchParams={params} />
+            <p className="text-xs text-secondary-500">
+              نمایش {toPersianNumbers((page - 1) * PAGE_SIZE + products.length)}{" "}
+              از {toPersianNumbers(pagination.total)} محصول
+            </p>
           </div>
         </div>
       </div>

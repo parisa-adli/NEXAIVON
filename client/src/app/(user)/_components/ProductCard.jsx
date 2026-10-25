@@ -2,16 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { LuStar } from "react-icons/lu";
 import AddToCart from "../products/[slug]/AddToCart";
+import LikeProduct from "../products/LikeProduct";
 import {
   toPersianNumbers,
   toPersianNumbersWithComma,
 } from "@/utils/toPersianNumber";
 
-function ProductCard({ product }) {
+function ProductCard({ product, showRating = true, showLike = false }) {
   const hasDiscount = product.discount > 0;
 
   return (
-    <article className="flex flex-col rounded-xl border border-secondary-200 bg-secondary-0 overflow-hidden">
+    <article className="relative flex flex-col rounded-xl border border-secondary-200 bg-secondary-0 overflow-hidden">
       <Link
         href={`/products/${product.slug}`}
         className="relative block aspect-[1.6] bg-secondary-100"
@@ -31,6 +32,11 @@ function ProductCard({ product }) {
           {hasDiscount ? "تخفیف" : "پرفروش"}
         </span>
       </Link>
+      {showLike && (
+        <div className="absolute top-2 left-2">
+          <LikeProduct product={product} />
+        </div>
+      )}
       <div className="flex flex-1 flex-col gap-y-3 p-4">
         <Link
           href={`/products/${product.slug}`}
@@ -38,22 +44,24 @@ function ProductCard({ product }) {
         >
           {product.title}
         </Link>
-        <div className="flex items-center gap-x-1 text-xs text-secondary-500">
-          <span className="flex" aria-label={`امتیاز ${product.rating} از ۵`}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <LuStar
-                key={n}
-                aria-hidden
-                className={`w-3.5 h-3.5 ${
-                  n <= Math.round(product.rating)
-                    ? "fill-star text-star"
-                    : "text-secondary-300"
-                }`}
-              />
-            ))}
-          </span>
-          <span>({toPersianNumbers(product.numReviews)})</span>
-        </div>
+        {showRating && (
+          <div className="flex items-center gap-x-1 text-xs text-secondary-500">
+            <span className="flex" aria-label={`امتیاز ${product.rating} از ۵`}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <LuStar
+                  key={n}
+                  aria-hidden
+                  className={`w-3.5 h-3.5 ${
+                    n <= Math.round(product.rating)
+                      ? "fill-star text-star"
+                      : "text-secondary-300"
+                  }`}
+                />
+              ))}
+            </span>
+            <span>({toPersianNumbers(product.numReviews)})</span>
+          </div>
+        )}
         <div className="mt-auto flex items-end justify-between">
           <div>
             {hasDiscount && (
