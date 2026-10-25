@@ -10,6 +10,7 @@ import {
 
 function ProductCard({ product, showRating = true, showLike = false }) {
   const hasDiscount = product.discount > 0;
+  const isBestseller = product.likesCount > 2;
 
   return (
     <article className="relative flex flex-col rounded-xl border border-secondary-200 bg-secondary-0 overflow-hidden">
@@ -24,13 +25,15 @@ function ProductCard({ product, showRating = true, showLike = false }) {
           sizes="(min-width: 1024px) 25vw, 50vw"
           className="object-contain p-4"
         />
-        <span
-          className={`absolute top-3 right-3 rounded px-2 py-0.5 text-xs text-white ${
-            hasDiscount ? "bg-badge-off" : "bg-badge-best"
-          }`}
-        >
-          {hasDiscount ? "تخفیف" : "پرفروش"}
-        </span>
+        {(hasDiscount || isBestseller) && (
+          <span
+            className={`absolute top-3 right-3 rounded px-2 py-0.5 text-xs text-white ${
+              hasDiscount ? "bg-badge-off" : "bg-badge-best"
+            }`}
+          >
+            {hasDiscount ? "تخفیف" : "پرفروش"}
+          </span>
+        )}
       </Link>
       {showLike && (
         <div className="absolute top-2 left-2">
