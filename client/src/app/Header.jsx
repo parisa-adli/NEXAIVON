@@ -96,8 +96,11 @@ function Header() {
                 )}
               </div>
             ) : (
-              <Link href="/auth" aria-label="ورود" className="hidden md:block">
-                <LuUser className="w-6 h-6" />
+              <Link
+                href="/auth"
+                className="hidden md:block rounded-full border border-secondary-200 px-4 py-1.5 text-sm font-medium hover:text-brand hover:border-brand"
+              >
+                ورود
               </Link>
             )}
             <Link

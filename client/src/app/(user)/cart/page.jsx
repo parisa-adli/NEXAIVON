@@ -24,7 +24,7 @@ function CartPage() {
 
   if (!user.cart.products || user.cart.products.length === 0)
     return (
-      <div>
+      <div className="container lg:max-w-screen-lg">
         <p className="font-bold mb-4">سبد خرید خالیه!</p>
         <Link href="/products" className="text-lg font-bold text-primary-900">
           رفتن به صفحه محصولات
