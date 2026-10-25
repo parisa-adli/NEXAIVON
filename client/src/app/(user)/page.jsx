@@ -19,12 +19,15 @@ export default async function Home() {
       <Hero />
 
       <section aria-label="دسته‌بندی‌ها">
+        <h2 className="text-lg font-bold text-secondary-900 pb-4">
+          دسته‌بندی محصولات
+        </h2>
         {/* columns stay at least ~150px wide so the 120px images never overflow */}
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {homeCategories.map(({ label, href, image }) => (
+          {homeCategories.map(({ label, category, image }) => (
             <li key={label}>
               <Link
-                href={href}
+                href={`/products?category=${category}`}
                 className="flex h-full flex-col items-center justify-center gap-y-4 rounded-xl bg-secondary-100 px-3 py-6 text-sm font-medium text-secondary-900 text-center"
               >
                 <Image
@@ -106,15 +109,19 @@ export default async function Home() {
         ))}
       </section>
 
-      <section className="rounded-xl bg-secondary-100 px-6 py-6">
-        <h2 className="text-center text-sm font-bold text-secondary-900 mb-6">
+      <section className="">
+        <h2 className="text-center text-lg font-bold text-secondary-900 mb-6">
           برندهای محبوب
         </h2>
-        <ul className="flex flex-wrap items-center justify-around gap-6 text-secondary-600">
-          {brands.map(({ name, icon: Icon }) => (
+        <ul className="flex flex-wrap items-center justify-around gap-6 rounded-xl bg-secondary-100 px-6 py-6 text-secondary-600">
+          {brands.map(({ name, icon: Icon, wide }) => (
             <li key={name} title={name}>
               {Icon ? (
-                <Icon aria-label={name} className="w-16 h-8" />
+                // scale enlarges the wordmark without changing the row's layout box
+                <Icon
+                  aria-label={name}
+                  className={`w-16 h-8 ${wide ? "scale-[2]" : ""}`}
+                />
               ) : (
                 <span className="text-xl font-bold tracking-wider">{name}</span>
               )}
@@ -124,6 +131,9 @@ export default async function Home() {
       </section>
 
       <section aria-label="خدمات فروشگاه">
+        <h2 className="text-center text-lg font-bold text-secondary-900 mb-6">
+          خدمات فروشگاه
+        </h2>
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 rounded-xl bg-secondary-100 px-4 py-6 lg:divide-x lg:divide-x-reverse divide-secondary-200">
           {services.map(({ title, subtitle, icon: Icon }) => (
             <li
