@@ -8,6 +8,7 @@ import { toPersianNumbers } from "@/utils/toPersianNumber";
 import BreadCrumbs from "@/common/BreadCrumbs";
 import ProductCard from "../_components/ProductCard";
 import Pagination from "./Pagination";
+import ServicesSection from "../_components/ServicesSection";
 
 export const dynamic = "force-dynamic"; // eq to { cache: 'no-store'} or SSR in page
 
@@ -77,6 +78,7 @@ async function ProductsPage({ searchParams }) {
           </div>
         </div>
       </div>
+      <ServicesSection />
     </div>
   );
 }

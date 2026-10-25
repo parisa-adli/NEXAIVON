@@ -2,7 +2,13 @@
 import { useGetUser } from "@/hooks/useAuth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LuHouse, LuLayoutGrid, LuShoppingCart, LuUser } from "react-icons/lu";
+import {
+  LuHouse,
+  LuLayoutGrid,
+  LuShoppingBag,
+  LuShoppingCart,
+  LuUser,
+} from "react-icons/lu";
 import { toPersianNumbers } from "@/utils/toPersianNumber";
 
 // RTL: first item sits on the right, matching docs/design/mobile-navbottom.png
@@ -10,6 +16,7 @@ const items = [
   { label: "سبد خرید", href: "/cart", icon: LuShoppingCart },
   { label: "دسته‌بندی‌ها", href: "/categories", icon: LuLayoutGrid },
   { label: "خانه", href: "/", icon: LuHouse },
+  { label: "محصولات", href: "/products", icon: LuShoppingBag },
   { label: "پروفایل", href: "/profile", icon: LuUser },
 ];
 
@@ -23,7 +30,7 @@ function BottomNav() {
       aria-label="منوی پایین"
       className="md:hidden fixed bottom-0 inset-x-0 z-20 bg-secondary-0 rounded-t-3xl shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-5">
         {items.map(({ label, href, icon: Icon }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
