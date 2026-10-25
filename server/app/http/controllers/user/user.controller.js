@@ -69,6 +69,9 @@ class userAuthController extends Controller {
 
     if (!user) throw createError.NotFound("کاربری با این مشخصات یافت نشد");
 
+    if (user.isBlocked)
+      throw createError.Forbidden("حساب کاربری شما غیرفعال شده است");
+
     if (user.otp.code != code)
       throw createError.BadRequest("کد ارسال شده صحیح نمیباشد");
 

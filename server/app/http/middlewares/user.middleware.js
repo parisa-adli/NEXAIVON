@@ -26,6 +26,9 @@ async function verifyAccessToken(req, res, next) {
             otp: 0,
           });
           if (!user) throw createHttpError.Unauthorized("حساب کاربری یافت نشد");
+          // 401 so optional-auth routes treat a deactivated user as a guest.
+          if (user.isBlocked)
+            throw createHttpError.Unauthorized("حساب کاربری شما غیرفعال شده است");
           req.user = user;
           return next();
         } catch (error) {

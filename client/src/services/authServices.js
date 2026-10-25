@@ -32,3 +32,9 @@ export function logout() {
 export function getAllUsers(options) {
   return http.get("/admin/user/list", options).then(({ data }) => data.data);
 }
+
+export function updateUserByAdmin({ id, data }) {
+  return http
+    .patch(`/admin/user/update/${id}`, data)
+    .then(({ data }) => data.data);
+}

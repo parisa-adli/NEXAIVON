@@ -2,6 +2,7 @@
 
 import Drawer from "@/common/Drawer";
 import HeaderPanel from "@/common/HeaderPanel";
+import PanelBreadCrumbs from "@/common/PanelBreadCrumbs";
 import { useState } from "react";
 import SideBar from "./SideBar";
 import BottomNav from "@/pages/BottomNav";
@@ -29,7 +30,10 @@ function FixedLayout({ children }) {
         <div className="hidden lg:block">
           <SideBar />
         </div>
-        <div className="flex-1 overflow-y-auto p-4 pb-24 md:pb-4">{children}</div>
+        <div className="flex-1 overflow-y-auto p-4 pb-24 md:pb-4">
+          <PanelBreadCrumbs />
+          {children}
+        </div>
       </div>
     </div>
   );

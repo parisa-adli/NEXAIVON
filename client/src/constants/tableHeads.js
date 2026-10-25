@@ -56,6 +56,10 @@ export const userListTHeads = [
   },
   {
     id: 7,
+    label: "وضعیت",
+  },
+  {
+    id: 8,
     label: "مشاهده",
   },
 ];
