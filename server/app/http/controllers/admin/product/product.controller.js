@@ -61,7 +61,7 @@ class ProductController extends Controller {
   async getListOfProducts(req, res) {
     let dbQuery = {};
     const user = req.user;
-    const { limit } = await productListQuerySchema.validateAsync(req.query);
+    const { limit, page } = await productListQuerySchema.validateAsync(req.query);
     const { search, category, sort, type } = req.query;
     // console.log({ category, sort, type });
     // Partial, case-insensitive match. Input is escaped so it is matched
@@ -102,7 +102,7 @@ class ProductController extends Controller {
         { $match: dbQuery },
         { $addFields: { likesCount: { $size: { $ifNull: ["$likes", []] } } } },
         { $sort: { likesCount: -1, createdAt: -1, _id: 1 } },
-        ...(limit ? [{ $limit: limit }] : []),
+        ...(limit ? [{ $skip: (page - 1) * limit }, { $limit: limit }] : []),
         { $project: { reviews: 0, likesCount: 0 } },
       ];
       loadProducts = ProductModel.aggregate(pipeline).then((docs) => {
@@ -115,7 +115,7 @@ class ProductController extends Controller {
       })
         .populate(populateCategory)
         .sort(sortQuery);
-      if (limit) loadProducts = loadProducts.limit(limit);
+      if (limit) loadProducts = loadProducts.skip((page - 1) * limit).limit(limit);
     }
     const [products, total] = await Promise.all([
       loadProducts,
@@ -144,7 +144,7 @@ class ProductController extends Controller {
         products: newProducts,
         ...(limit && {
           pagination: {
-            page: 1,
+            page,
             limit,
             total,
             totalPages: Math.ceil(total / limit),

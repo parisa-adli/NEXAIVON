@@ -158,6 +158,41 @@ describe("GET /api/product/list?limit=", () => {
     });
   });
 
+  it("returns the requested page of products", async () => {
+    await seedProducts(6);
+
+    const res = await request(createApp()).get(
+      "/api/product/list?limit=4&sort=latest&page=2"
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.products.map((p) => p.slug)).toEqual(["p2", "p1"]);
+    expect(res.body.data.pagination).toEqual({
+      page: 2,
+      limit: 4,
+      total: 6,
+      totalPages: 2,
+    });
+  });
+
+  it("pages the popular ordering too", async () => {
+    await seedProducts(4, [1, 3, 0, 2]);
+
+    const res = await request(createApp()).get(
+      "/api/product/list?sort=popular&limit=2&page=2"
+    );
+
+    expect(res.body.data.products.map((p) => p.slug)).toEqual(["p1", "p3"]);
+  });
+
+  it.each(["0", "-1", "abc", "1.5"])("rejects page=%s with 400", async (page) => {
+    const res = await request(createApp()).get(
+      `/api/product/list?limit=4&page=${page}`
+    );
+
+    expect(res.status).toBe(400);
+  });
+
   it("returns every product and no pagination when limit is omitted", async () => {
     await seedProducts(6);
 
