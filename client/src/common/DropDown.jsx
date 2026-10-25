@@ -18,13 +18,9 @@ function DropDown({ user, onClose }) {
       className="absolute left-0 mt-2 w-48 bg-secondary-50 border border-secondary-100 rounded-lg shadow-lg z-10"
     >
       <div className="flex flex-col gap-y-4 p-4">
-        <div className="flex items-center gap-x-5">
+        <Link className="py-2 flex items-center gap-x-5" href="/profile">
           <FaUserAlt />
           <span>{user.name}</span>
-        </div>
-        <Link className="py-2 flex items-center gap-x-5" href="/profile">
-          <LuPanelRightClose />
-          <span>حساب کاربری</span>
         </Link>
         {user && user.role === "ADMIN" ? (
           <Link className="py-2 flex items-center gap-x-5" href="/admin">

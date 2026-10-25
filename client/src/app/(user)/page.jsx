@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { LuArrowLeft, LuChevronLeft } from "react-icons/lu";
 import { getProducts } from "@/services/productService";
-import { brands, homeCategories, promos, services } from "@/constants/home";
+import { brands, promos, services } from "@/constants/home";
+import CategoriesSection from "./_components/CategoriesSection";
 import Hero from "./_components/Hero";
 import ProductCard from "./_components/ProductCard";
 
@@ -17,32 +18,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col gap-y-12 px-4">
       <Hero />
-
-      <section aria-label="دسته‌بندی‌ها">
-        <h2 className="text-lg font-bold text-secondary-900 pb-4">
-          دسته‌بندی محصولات
-        </h2>
-        {/* columns stay at least ~150px wide so the 120px images never overflow */}
-        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {homeCategories.map(({ label, category, image }) => (
-            <li key={label}>
-              <Link
-                href={`/products?category=${category}`}
-                className="flex h-full flex-col items-center justify-center gap-y-4 rounded-xl bg-secondary-100 px-3 py-6 text-sm font-medium text-secondary-900 text-center"
-              >
-                <Image
-                  src={image}
-                  alt=""
-                  width={120}
-                  height={120}
-                  className="w-[120px] h-[120px] shrink-0 object-contain"
-                />
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <CategoriesSection />
 
       {products.length > 0 && (
         <section>
@@ -70,21 +46,22 @@ export default async function Home() {
         {promos.map(({ chip, title, subtitle, image, dark }) => (
           <div
             key={title}
-            className={`flex items-center justify-between gap-4 rounded-2xl p-8 ${
+            className={`flex min-w-0 items-center justify-between gap-4 rounded-2xl p-5 sm:p-8 ${
               dark
                 ? "bg-promo-dark text-white"
                 : "bg-secondary-100 text-secondary-900"
             }`}
           >
-            <div className="space-y-3">
+            {/* min-w-0 lets the text wrap instead of pushing the card wider than the screen */}
+            <div className="min-w-0 space-y-3">
               <span
-                className={`inline-block rounded-full px-3 py-1 text-xs ${
+                className={`inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs ${
                   dark ? "bg-white/15" : "bg-secondary-0"
                 }`}
               >
                 {chip}
               </span>
-              <h3 className="text-xl font-bold">{title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold">{title}</h3>
               <p
                 className={`text-sm ${dark ? "text-white/80" : "text-secondary-600"}`}
               >
@@ -92,7 +69,7 @@ export default async function Home() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-x-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-gray-900"
+                className="inline-flex items-center gap-x-2 whitespace-nowrap rounded-full bg-white px-4 py-2 text-xs font-medium text-gray-900"
               >
                 مشاهده محصولات
                 <LuChevronLeft />
@@ -103,7 +80,7 @@ export default async function Home() {
               alt=""
               width={160}
               height={160}
-              className="w-36 h-36 shrink-0 object-contain"
+              className="w-24 h-24 sm:w-36 sm:h-36 shrink-0 object-contain"
             />
           </div>
         ))}
@@ -111,7 +88,7 @@ export default async function Home() {
 
       <section className="">
         <h2 className="text-center text-lg font-bold text-secondary-900 mb-6">
-          برندهای محبوب
+          <span className="border-b pb-2">برندهای محبوب</span>
         </h2>
         <ul className="flex flex-wrap items-center justify-around gap-6 rounded-xl bg-secondary-100 px-6 py-6 text-secondary-600">
           {brands.map(({ name, icon: Icon, wide }) => (
@@ -132,7 +109,7 @@ export default async function Home() {
 
       <section aria-label="خدمات فروشگاه">
         <h2 className="text-center text-lg font-bold text-secondary-900 mb-6">
-          خدمات فروشگاه
+          <span className="border-b pb-2">خدمات فروشگاه</span>
         </h2>
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 rounded-xl bg-secondary-100 px-4 py-6 lg:divide-x lg:divide-x-reverse divide-secondary-200">
           {services.map(({ title, subtitle, icon: Icon }) => (
