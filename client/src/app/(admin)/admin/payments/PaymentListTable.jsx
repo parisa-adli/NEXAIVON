@@ -1,3 +1,4 @@
+import DragScroll from "@/common/DragScroll";
 import { adminPaymentListTHeads } from "@/constants/tableHeads";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
@@ -6,7 +7,7 @@ import { toPersianNumbersWithComma } from "@/utils/toPersianNumber";
 
 function PaymentListTable({ payments }) {
   return (
-    <div className="shadow-sm overflow-auto mt-8">
+    <DragScroll className="shadow-sm overflow-auto mt-8">
       <table className="border-collapse table-auto w-full min-w-[800px] text-sm ">
         <thead>
           <tr>
@@ -72,7 +73,7 @@ function PaymentListTable({ payments }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </DragScroll>
   );
 }
 export default PaymentListTable;

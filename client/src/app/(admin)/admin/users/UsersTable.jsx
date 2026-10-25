@@ -1,3 +1,4 @@
+import DragScroll from "@/common/DragScroll";
 import { userListTHeads } from "@/constants/tableHeads";
 import { toLocalDateStringShort } from "@/utils/toLocalDate";
 import { FaCheckCircle } from "react-icons/fa";
@@ -6,7 +7,7 @@ import { FaEye } from "react-icons/fa6";
 
 function UsersTable({ users }) {
   return (
-    <div className="shadow-sm overflow-auto my-8">
+    <DragScroll className="shadow-sm overflow-auto my-8">
       <table className="border-collapse table-auto w-full min-w-[800px] text-sm ">
         <thead>
           <tr>
@@ -56,7 +57,7 @@ function UsersTable({ users }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </DragScroll>
   );
 }
 export default UsersTable;

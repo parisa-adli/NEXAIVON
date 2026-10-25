@@ -7,8 +7,13 @@ import { HiUser } from "react-icons/hi2";
 import { MdPayment, MdLogout } from "react-icons/md";
 import { logout } from "@/services/authServices";
 import { IoClose } from "react-icons/io5";
+import { FaUserLock } from "react-icons/fa";
+import { useGetUser } from "@/hooks/useAuth";
 
 function SideBar({ onClose, isOpenDrawer }) {
+  const { data } = useGetUser();
+  const isAdmin = data?.user?.role === "ADMIN";
+
   const logoutHandler = async () => {
     await logout();
     // localStorage.removeItem("userInfo");
@@ -54,6 +59,14 @@ function SideBar({ onClose, isOpenDrawer }) {
           </span>
           <Link href="/profile/payments">سفارشات</Link>
         </li>
+        {isAdmin && (
+          <li className="flex items-center gap-x-2">
+            <span>
+              <FaUserLock className="btnIcon" />
+            </span>
+            <Link href="/admin">پنل ادمین</Link>
+          </li>
+        )}
         <li>
           <button onClick={logoutHandler} className="flex items-center gap-x-2">
             <span>

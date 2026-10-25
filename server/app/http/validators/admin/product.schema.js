@@ -60,6 +60,11 @@ const productListQuerySchema = Joi.object({
     .min(1)
     .max(48)
     .error(createError.BadRequest("تعداد محصولات باید عددی بین ۱ تا ۴۸ باشد")),
+  page: Joi.number()
+    .integer()
+    .min(1)
+    .default(1)
+    .error(createError.BadRequest("شماره صفحه باید عددی صحیح و بزرگتر از صفر باشد")),
 }).unknown(true);
 
 module.exports = {

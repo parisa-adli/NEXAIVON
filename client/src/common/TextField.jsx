@@ -1,13 +1,23 @@
-function TextField({ label, name, value, onChange, disabled = "" }) {
+function TextField({
+  label,
+  name,
+  value,
+  onChange,
+  disabled = "",
+  multiline = false,
+}) {
+  const Input = multiline ? "textarea" : "input";
+
   return (
     <div>
       <label htmlFor={name} className="block mb-2">
         {label}
       </label>
-      <input
+      <Input
         autoCapitalize="off"
         className="textField__input"
-        type="text"
+        type={multiline ? undefined : "text"}
+        rows={multiline ? 5 : undefined}
         name={name}
         id={name}
         value={value}

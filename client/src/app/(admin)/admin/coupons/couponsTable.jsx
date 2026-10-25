@@ -1,3 +1,4 @@
+import DragScroll from "@/common/DragScroll";
 import { couponListTHeads } from "@/constants/tableHeads";
 import Link from "next/link";
 import { FaEye } from "react-icons/fa";
@@ -33,69 +34,74 @@ function CouponsTable({ coupons }) {
   };
 
   return (
-    <div className="shadow-sm overflow-auto my-8">
-      <table className="border-collapse table-auto w-full min-w-[800px] text-sm ">
-        <thead>
-          <tr>
-            {couponListTHeads.map((item) => (
-              <th className="table__th" key={item.id}>
-                {item.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {coupons.map((coupon, index) => (
-            <tr key={coupon._id}>
-              <td className="table__td">{index + 1}</td>
-              <td className="table__td">{coupon.code}</td>
-              <td className="table__td">
-                <span className="badge badge--primary">{coupon.type}</span>
-              </td>
-              <td className="table__td">
-                {toPersianNumbersWithComma(coupon.amount)}
-              </td>
-              <td className="table__td">
-                <div className="flex flex-col gap-y-2 items-start">
-                  {coupon.productIds.map((product) => (
-                    <span className="badge badge--secondary" key={product._id}>
-                      {product.title}
-                    </span>
-                  ))}
-                </div>
-              </td>
-              <td className="table__td">
-                {toPersianNumbers(coupon.usageCount)}
-              </td>
-              <td className="table__td">
-                {toPersianNumbers(coupon.usageLimit)}
-              </td>
-              <td className="table__td">
-                {toLocalDateStringShort(coupon.createdAt)}
-              </td>
-              <td className="table__td">
-                <div className="flex items-center gap-x-2">
-                  <Link href={`/admin/coupons/${coupon._id}`}>
-                    <FaEye className="w-5 h-5 text-primary-900" />
-                  </Link>
-                  <Link href={`/admin/coupons/edit/${coupon._id}`}>
-                    <FiEdit3 className="w-5 h-5 text-secondary-600" />
-                  </Link>
-                  <div
-                    onClick={() => {
-                      setSelected(coupon);
-                      setIsOpen(true);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <HiOutlineTrash className="w-5 h-5 text-rose-500" />
-                  </div>
-                </div>
-              </td>
+    <>
+      <DragScroll className="shadow-sm overflow-auto my-8">
+        <table className="border-collapse table-auto w-full min-w-[800px] text-sm ">
+          <thead>
+            <tr>
+              {couponListTHeads.map((item) => (
+                <th className="table__th" key={item.id}>
+                  {item.label}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {coupons.map((coupon, index) => (
+              <tr key={coupon._id}>
+                <td className="table__td">{index + 1}</td>
+                <td className="table__td">{coupon.code}</td>
+                <td className="table__td">
+                  <span className="badge badge--primary">{coupon.type}</span>
+                </td>
+                <td className="table__td">
+                  {toPersianNumbersWithComma(coupon.amount)}
+                </td>
+                <td className="table__td">
+                  <div className="flex flex-col gap-y-2 items-start">
+                    {coupon.productIds.map((product) => (
+                      <span
+                        className="badge badge--secondary"
+                        key={product._id}
+                      >
+                        {product.title}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td className="table__td">
+                  {toPersianNumbers(coupon.usageCount)}
+                </td>
+                <td className="table__td">
+                  {toPersianNumbers(coupon.usageLimit)}
+                </td>
+                <td className="table__td">
+                  {toLocalDateStringShort(coupon.createdAt)}
+                </td>
+                <td className="table__td">
+                  <div className="flex items-center gap-x-2">
+                    <Link href={`/admin/coupons/${coupon._id}`}>
+                      <FaEye className="w-5 h-5 text-primary-900" />
+                    </Link>
+                    <Link href={`/admin/coupons/edit/${coupon._id}`}>
+                      <FiEdit3 className="w-5 h-5 text-secondary-600" />
+                    </Link>
+                    <div
+                      onClick={() => {
+                        setSelected(coupon);
+                        setIsOpen(true);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <HiOutlineTrash className="w-5 h-5 text-rose-500" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </DragScroll>
       <Modal
         open={isOpen}
         onClose={() => setIsOpen(false)}
@@ -107,7 +113,7 @@ function CouponsTable({ coupons }) {
           onConfirm={() => removeCouponHandler(selected._id)}
         />
       </Modal>
-    </div>
+    </>
   );
 }
 export default CouponsTable;

@@ -2,10 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { LuArrowLeft, LuChevronLeft } from "react-icons/lu";
 import { getProducts } from "@/services/productService";
-import { brands, promos, services } from "@/constants/home";
+import { brands, promos } from "@/constants/home";
 import CategoriesSection from "./_components/CategoriesSection";
 import Hero from "./_components/Hero";
 import ProductCard from "./_components/ProductCard";
+import ServicesSection from "./_components/ServicesSection";
 
 export const revalidate = 60;
 
@@ -106,26 +107,7 @@ export default async function Home() {
           ))}
         </ul>
       </section>
-
-      <section aria-label="خدمات فروشگاه">
-        <h2 className="text-center text-lg font-bold text-secondary-900 mb-6">
-          <span className="border-b pb-2">خدمات فروشگاه</span>
-        </h2>
-        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 rounded-xl bg-secondary-100 px-4 py-6 lg:divide-x lg:divide-x-reverse divide-secondary-200">
-          {services.map(({ title, subtitle, icon: Icon }) => (
-            <li
-              key={title}
-              className="flex items-center justify-center gap-x-3"
-            >
-              <Icon aria-hidden className="w-7 h-7 text-secondary-800" />
-              <div>
-                <p className="text-sm font-bold text-secondary-900">{title}</p>
-                <p className="text-xs text-secondary-500">{subtitle}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ServicesSection />
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="fa" dir="rtl">
       <body
         suppressHydrationWarning
-        className={`${vazirFont.variable} font-sans bg-secondary-0 text-secondary-700`}
+        className={`${vazirFont.variable} theme-store font-sans bg-secondary-0 text-secondary-700`}
       >
         <Providers>
           <Toaster />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LuChevronLeft } from "react-icons/lu";
 
 export default function BreadCrumbs({ breadcrumbs }) {
   return (
@@ -16,7 +17,7 @@ export default function BreadCrumbs({ breadcrumbs }) {
           >
             <Link href={breadcrumb.href}>{breadcrumb.label}</Link>
             {index < breadcrumbs.length - 1 ? (
-              <span className="inline-block">/</span>
+              <LuChevronLeft aria-hidden className="w-4 h-4 self-center" />
             ) : null}
           </li>
         ))}

@@ -18,7 +18,7 @@ function ProductsPage() {
         <h1 className="font-bold">محصولات</h1>
         <Link
           href="/admin/products/add"
-          className="flex items-center text-primary-900 gap-x-1 text-sm font-bold"
+          className="theme-accent flex items-center text-primary-900 gap-x-1 text-sm font-bold"
         >
           <FaPlusCircle />
           اضافه کردن محصول

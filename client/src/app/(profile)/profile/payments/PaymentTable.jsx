@@ -1,10 +1,11 @@
+import DragScroll from "@/common/DragScroll";
 import { userPaymentTHeads } from "@/constants/tableHeads";
 import { toLocalDateString } from "@/utils/toLocalDate";
 import { toPersianNumbersWithComma } from "@/utils/toPersianNumber";
 
 function PaymentTable({ payments }) {
   return (
-    <div className="shadow-sm overflow-auto my-8">
+    <DragScroll className="shadow-sm overflow-auto my-8">
       <table className="border-collapse table-auto w-full min-w-[800px] text-sm">
         <thead>
           <tr>
@@ -51,7 +52,7 @@ function PaymentTable({ payments }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </DragScroll>
   );
 }
 export default PaymentTable;

@@ -14,6 +14,7 @@ const productsFormData = [
     id: 2,
     label: "توضیحات",
     name: "description",
+    multiline: true,
   },
   {
     id: 3,
@@ -73,6 +74,7 @@ function ProductForm({
             name={item.name}
             value={productData[item.name] ?? ""}
             onChange={productDataOnChange}
+            multiline={item.multiline}
           />
         ))}
         <div>

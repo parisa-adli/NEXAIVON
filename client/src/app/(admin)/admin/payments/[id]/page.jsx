@@ -1,5 +1,6 @@
 "use client";
 
+import DragScroll from "@/common/DragScroll";
 import Loading from "@/common/Loading";
 import TextArea from "@/common/TextAria";
 import TextFieldDetail from "@/common/TextFieldDetail";
@@ -52,7 +53,7 @@ function PaymentPage() {
 
       {openFactor ? (
         <div className="border rounded-xl shadow-sm overflow-hidden">
-          <div className=" overflow-auto">
+          <DragScroll className=" overflow-auto">
             <table className="border-collapse table-auto w-full min-w-lg text-sm">
               <tbody>
                 {paymentDetailTHeads.map((item, index) => (
@@ -83,15 +84,15 @@ function PaymentPage() {
                         </span>
                       ) : index === 6 ? (
                         toPersianNumbersWithComma(
-                          payment[0].cart.payDetail.totalGrossPrice
+                          payment[0].cart.payDetail.totalGrossPrice,
                         ) + " تومان"
                       ) : index === 7 ? (
                         toPersianNumbersWithComma(
-                          payment[0].cart.payDetail.totalOffAmount
+                          payment[0].cart.payDetail.totalOffAmount,
                         ) + " تومان"
                       ) : index === 8 ? (
                         toPersianNumbersWithComma(
-                          payment[0].cart.payDetail.totalPrice
+                          payment[0].cart.payDetail.totalPrice,
                         ) + " تومان"
                       ) : index === 9 ? (
                         payment[0].user.name
@@ -103,7 +104,7 @@ function PaymentPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </DragScroll>
         </div>
       ) : (
         <div className="space-y-4">
@@ -151,7 +152,7 @@ function PaymentPage() {
           </div>
           <div>
             <span className="block mb-2">جزئیات پرداخت</span>
-            <div className="border rounded-xl p-4 overflow-x-auto">
+            <DragScroll className="border rounded-xl p-4 overflow-x-auto">
               <table className="border-collapse table-auto w-full text-sm ">
                 <thead>
                   <tr>
@@ -164,27 +165,27 @@ function PaymentPage() {
                   <tr>
                     <td className="p-3 pb-0 pr-8">
                       {toPersianNumbersWithComma(
-                        payment[0].cart.payDetail.totalGrossPrice
+                        payment[0].cart.payDetail.totalGrossPrice,
                       ) + " تومان" || ""}
                     </td>
                     <td className="p-3 pb-0 pr-8">
                       {toPersianNumbersWithComma(
-                        payment[0].cart.payDetail.totalOffAmount
+                        payment[0].cart.payDetail.totalOffAmount,
                       ) + " تومان" || ""}
                     </td>
                     <td className="p-3 pb-0 pr-8">
                       {toPersianNumbersWithComma(
-                        payment[0].cart.payDetail.totalPrice
+                        payment[0].cart.payDetail.totalPrice,
                       ) + " تومان" || ""}
                     </td>
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </DragScroll>
           </div>
           <div>
             <span className="block mb-2">اطلاعات کاربر</span>
-            <div className="border rounded-xl p-4 overflow-x-auto">
+            <DragScroll className="border rounded-xl p-4 overflow-x-auto">
               <table className="border-collapse table-auto w-full text-sm ">
                 <thead>
                   <tr>
@@ -207,7 +208,7 @@ function PaymentPage() {
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </DragScroll>
           </div>
         </div>
       )}
