@@ -8,8 +8,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { LuCheck, LuShoppingCart } from "react-icons/lu";
 
-function AddToCart({ product }) {
+function AddToCart({ product, compact = false }) {
   const queryClient = useQueryClient();
 
   const router = useRouter();
@@ -40,6 +41,26 @@ function AddToCart({ product }) {
     if (!user) return false;
     return user.cart?.products.some((p) => p.productId === product._id);
   };
+
+  if (compact) {
+    const iconClass =
+      "w-9 h-9 flex items-center justify-center rounded-md bg-brand-tint text-brand";
+    return isInCart(user, product) ? (
+      <Link href="/cart" aria-label="ادامه سفارش" className={iconClass}>
+        <LuCheck className="w-5 h-5" />
+      </Link>
+    ) : (
+      <button
+        type="button"
+        aria-label="افزودن به سبد خرید"
+        disabled={isPending}
+        onClick={addToCartHandler}
+        className={`${iconClass} disabled:opacity-50`}
+      >
+        <LuShoppingCart className="w-5 h-5" />
+      </button>
+    );
+  }
 
   return (
     <div>

@@ -3,6 +3,7 @@ import "../globals.css";
 import Providers from "../Providers";
 import { Toaster } from "react-hot-toast";
 import Header from "../Header";
+import Footer from "../Footer";
 
 export const metadata = {
   title: "NEXAIVON",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
           <Toaster />
           <Header />
           <div className="container xl:max-w-screen-xl">{children}</div>
+          <Footer />
         </Providers>
       </body>
     </html>

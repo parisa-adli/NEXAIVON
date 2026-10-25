@@ -1,22 +1,24 @@
 "use client";
 import DarkModeToggle from "@/common/DarkModeToggle";
 import { useGetUser } from "@/hooks/useAuth";
-import Image from "next/image";
 import Link from "next/link";
-import { FaCartShopping } from "react-icons/fa6";
-import { FaUserAlt } from "react-icons/fa";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import DropDown from "@/common/DropDown";
-import { MdLogout } from "react-icons/md";
+import Logo from "@/common/Logo";
+import { navLinks } from "@/constants/home";
+import { toPersianNumbers } from "@/utils/toPersianNumber";
+import { LuSearch, LuShoppingCart, LuUser } from "react-icons/lu";
 
 function Header() {
-  const { data, error, isLoading } = useGetUser();
+  const { data, isLoading } = useGetUser();
   const { user, cart } = data || {};
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header
-      className={`shadow-md mb-10 px-4 sticky top-0 transition-all duration-200 bg-secondary-50 z-10
+      className={`mb-6 px-4 sticky top-0 transition-all duration-200 bg-secondary-0 z-10
         ${
           isLoading
             ? "blur-sm opacity-70 pointer-events-none"
@@ -24,58 +26,69 @@ function Header() {
         }
         `}
     >
-      <nav>
-        <ul className="flex items-center justify-between py-2 container xl:max-w-screen-xl">
-          <div className="flex items-center gap-x-4 sm:gap-x-8">
-            <li>
-              <Link className="py-2 flex items-center gap-x-2" href="/">
-                <Image src="/shop.png" alt="NEXAIVON" width={24} height={24} />
-                <h1 className="text-primary-900 text-lg font-bold">NEXAIVON</h1>
-              </Link>
-            </li>
-            <li>
-              <Link className="hidden sm:block py-2" href="/products">
-                محصولات
-              </Link>
-            </li>
-          </div>
-          <div className="flex items-center gap-x-4">
-            <DarkModeToggle />
-            {user ? (
-              <div className="relative flex items-center gap-x-6  border-l pl-4 border-secondary-700">
-                <div
-                  onClick={() => setIsOpen((prev) => !prev)}
-                  className="cursor-pointer"
-                >
-                  <FaUserAlt className="w-5 h-5 text-secondary-600" />
-                  {isOpen && (
-                    <DropDown user={user} onClose={() => setIsOpen(false)} />
-                  )}
-                  {/* {user.name} */}
-                </div>
-              </div>
-            ) : (
-              <li>
+      <div className="container xl:max-w-screen-xl flex items-center justify-between gap-x-4 py-3">
+        <Logo />
+        <form
+          action="/products"
+          className="hidden md:flex items-center gap-x-2 flex-1 max-w-md bg-secondary-100 rounded-full px-4"
+        >
+          <LuSearch className="w-5 h-5 text-secondary-500" />
+          <input
+            name="search"
+            type="search"
+            aria-label="جستجو در محصولات"
+            placeholder="جستجو در محصولات..."
+            className="w-full bg-transparent py-2.5 text-sm outline-none"
+          />
+        </form>
+        <div className="flex items-center gap-x-4">
+          <DarkModeToggle />
+          {user ? (
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="حساب کاربری"
+                // DropDown closes itself on outside mousedown, so a toggle here would reopen it
+                onClick={() => setIsOpen(true)}
+              >
+                <LuUser className="w-6 h-6" />
+              </button>
+              {isOpen && (
+                <DropDown user={user} onClose={() => setIsOpen(false)} />
+              )}
+            </div>
+          ) : (
+            <Link href="/auth" aria-label="ورود">
+              <LuUser className="w-6 h-6" />
+            </Link>
+          )}
+          <Link href="/cart" aria-label="سبد خرید" className="relative">
+            <LuShoppingCart className="w-6 h-6" />
+            <span className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full bg-brand text-white text-xs">
+              {toPersianNumbers(cart ? cart.payDetail.productIds.length : 0)}
+            </span>
+          </Link>
+        </div>
+      </div>
+      <nav className="container xl:max-w-screen-xl overflow-x-auto">
+        <ul className="flex md:justify-center gap-x-8 text-sm font-medium whitespace-nowrap">
+          {navLinks.map((link) => {
+            const isActive = link.href === "/" && pathname === "/";
+            return (
+              <li key={link.label}>
                 <Link
-                  className="flex items-center gap-x-1 py-0.5 text-white bg-primary-900 px-2 rounded-lg ml-2"
-                  href="/auth"
+                  href={link.href}
+                  className={`block py-3 border-b-2 ${
+                    isActive
+                      ? "text-brand border-brand"
+                      : "border-transparent hover:text-brand"
+                  }`}
                 >
-                  <span>ورود</span>
-                  <MdLogout className="transform scale-x-[-1]" />
+                  {link.label}
                 </Link>
               </li>
-            )}
-            <li>
-              <Link className="flex items-center gap-x-3" href="/cart">
-                <span className="relative">
-                  <FaCartShopping className="w-5 h-5 " />
-                  <span className="absolute -bottom-1.5 -right-2 bg-rose-500 px-[3px] py-[1px] rounded-xl text-white text-sm">
-                    {cart ? cart.payDetail.productIds.length : 0}
-                  </span>
-                </span>
-              </Link>
-            </li>
-          </div>
+            );
+          })}
         </ul>
       </nav>
     </header>

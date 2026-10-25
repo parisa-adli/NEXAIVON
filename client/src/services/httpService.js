@@ -14,7 +14,8 @@ app.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalConfig = err.config;
-    if (err.response.status === 401 && !originalConfig._retry) {
+    // network errors (API down) have no response
+    if (err.response?.status === 401 && !originalConfig._retry) {
       originalConfig._retry = true;
       try {
         //const { data } = await app.get("/user/refresh-token") -> unlimited request when not refreshToken

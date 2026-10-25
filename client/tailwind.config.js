@@ -50,6 +50,18 @@ module.exports = {
         success: withOpacity("--color-success"),
         warning: withOpacity("--color-warning"),
         error: withOpacity("--color-error"),
+        brand: {
+          DEFAULT: withOpacity("--color-brand"),
+          tint: withOpacity("--color-brand-tint"),
+        },
+        footer: withOpacity("--color-footer"),
+        "promo-dark": withOpacity("--color-promo-dark"),
+        star: withOpacity("--color-star"),
+        badge: {
+          best: withOpacity("--color-badge-best"),
+          new: withOpacity("--color-badge-new"),
+          off: withOpacity("--color-badge-off"),
+        },
       },
       fontFamily: {
         sans: ["var(--font-vazir)", ...fontFamily.sans],

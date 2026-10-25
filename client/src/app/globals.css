@@ -33,6 +33,15 @@
       --color-error: 255, 71, 87;
       --color-red-500: 239, 68, 68;
       --color-red-300: 252, 165, 165;
+      /* storefront tokens sampled from docs/design (design.md §2); dark mode unspecified */
+      --color-brand: 38, 78, 53;
+      --color-brand-tint: 217, 224, 203;
+      --color-footer: 24, 33, 43;
+      --color-promo-dark: 54, 72, 63;
+      --color-star: 248, 162, 6;
+      --color-badge-best: 17, 153, 35;
+      --color-badge-new: 10, 126, 201;
+      --color-badge-off: 253, 118, 114;
     }
     &.dark-mode {
       --background-app-rgb: 20, 20, 20;

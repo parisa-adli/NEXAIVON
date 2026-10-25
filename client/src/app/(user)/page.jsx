@@ -1,16 +1,125 @@
-import SortProducts from "./_components/SortProducts";
-import LoadProducts from "./_components/LoadProducts";
-import LatestProducts from "./_components/LatestProducts";
+import Link from "next/link";
+import { LuArrowLeft, LuChevronLeft } from "react-icons/lu";
+import { getProducts } from "@/services/productService";
+import { brands, homeCategories, promos, services } from "@/constants/home";
+import Hero from "./_components/Hero";
+import ProductCard from "./_components/ProductCard";
 
-export default async function Home({ searchParams }) {
+export const revalidate = 60;
+
+export default async function Home() {
+  // keep the rest of the homepage up when the API is unreachable
+  const { products } = await getProducts("sort=popular&limit=4").catch(() => ({
+    products: [],
+  }));
+
   return (
-    <div className="flex flex-col gap-y-10 px-4">
-      <LatestProducts />
-      <div>
-        <h3 className="font-bold text-lg mb-2">محصولات</h3>
-        <SortProducts />
-        <LoadProducts searchParams={searchParams} />
-      </div>
+    <div className="flex flex-col gap-y-12 px-4">
+      <Hero />
+
+      <section aria-label="دسته‌بندی‌ها">
+        <ul className="grid grid-cols-3 md:grid-cols-6 gap-4">
+          {homeCategories.map(({ label, href, icon: Icon }) => (
+            <li key={label}>
+              <Link
+                href={href}
+                className="flex flex-col items-center gap-y-4 rounded-xl bg-secondary-100 px-2 py-6 text-sm font-medium text-secondary-900 text-center"
+              >
+                <Icon aria-hidden className="w-12 h-12 stroke-1" />
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {products.length > 0 && (
+      <section>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-secondary-900">
+            پرفروش‌ترین محصولات
+          </h2>
+          <Link
+            href="/products?sort=popular"
+            className="flex items-center gap-x-1 text-sm text-secondary-600"
+          >
+            مشاهده همه
+            <LuArrowLeft />
+          </Link>
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.slice(0, 4).map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      </section>
+      )}
+
+      <section className="grid gap-5 md:grid-cols-2">
+        {promos.map(({ chip, title, subtitle, icon: Icon, dark }) => (
+          <div
+            key={title}
+            className={`flex items-center justify-between gap-4 rounded-2xl p-8 ${
+              dark
+                ? "bg-promo-dark text-white"
+                : "bg-secondary-100 text-secondary-900"
+            }`}
+          >
+            <div className="space-y-3">
+              <span
+                className={`inline-block rounded-full px-3 py-1 text-xs ${
+                  dark ? "bg-white/15" : "bg-secondary-0"
+                }`}
+              >
+                {chip}
+              </span>
+              <h3 className="text-xl font-bold">{title}</h3>
+              <p className={`text-sm ${dark ? "text-white/80" : "text-secondary-600"}`}>
+                {subtitle}
+              </p>
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-x-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-gray-900"
+              >
+                مشاهده محصولات
+                <LuChevronLeft />
+              </Link>
+            </div>
+            <Icon aria-hidden className="w-28 h-28 shrink-0 stroke-1 opacity-80" />
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-xl bg-secondary-100 px-6 py-6">
+        <h2 className="text-center text-sm font-bold text-secondary-900 mb-6">
+          برندهای محبوب
+        </h2>
+        <ul className="flex flex-wrap items-center justify-around gap-6 text-secondary-600">
+          {brands.map(({ name, icon: Icon }) => (
+            <li key={name} title={name}>
+              {Icon ? (
+                <Icon aria-label={name} className="w-16 h-8" />
+              ) : (
+                <span className="text-xl font-bold tracking-wider">{name}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-label="خدمات فروشگاه">
+        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 rounded-xl bg-secondary-100 px-4 py-6 lg:divide-x lg:divide-x-reverse divide-secondary-200">
+          {services.map(({ title, subtitle, icon: Icon }) => (
+            <li key={title} className="flex items-center justify-center gap-x-3">
+              <Icon aria-hidden className="w-7 h-7 text-secondary-800" />
+              <div>
+                <p className="text-sm font-bold text-secondary-900">{title}</p>
+                <p className="text-xs text-secondary-500">{subtitle}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
