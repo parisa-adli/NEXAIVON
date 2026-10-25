@@ -72,6 +72,19 @@
     --color-primary-100: 217, 224, 203;
     --color-primary-50: 227, 232, 229;
   }
+  /* admin "add" links and add pages: primary ramp = #869A7E mixed toward white */
+  .theme-accent {
+    --color-primary-900: 134, 154, 126;
+    --color-primary-800: 146, 164, 139;
+    --color-primary-700: 158, 174, 152;
+    --color-primary-600: 170, 184, 165;
+    --color-primary-500: 182, 194, 178;
+    --color-primary-400: 195, 205, 191;
+    --color-primary-300: 207, 215, 203;
+    --color-primary-200: 219, 225, 216;
+    --color-primary-100: 231, 235, 229;
+    --color-primary-50: 239, 242, 238;
+  }
 }
 
 @layer components {

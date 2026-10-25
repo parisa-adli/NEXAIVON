@@ -43,7 +43,7 @@ function AddCouponPage() {
   };
 
   return (
-    <div className="mb-10">
+    <div className="theme-accent mb-10">
       <h1 className="mb-8 font-bold text-xl">اضافه کردن کد تخفیف</h1>
       <CouponForm
         formData={formData}

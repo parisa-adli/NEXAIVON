@@ -46,7 +46,7 @@ function AddProductPage() {
   };
 
   return (
-    <div className="mb-10">
+    <div className="theme-accent mb-10">
       <h1 className="mb-4 font-bold text-xl">اضافه کردن محصول</h1>
       <ProductForm
         onSubmit={handleSubmit}

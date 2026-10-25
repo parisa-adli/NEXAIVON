@@ -35,7 +35,7 @@ function AddCategoryPage() {
   };
 
   return (
-    <div className="mb-10">
+    <div className="theme-accent mb-10">
       <h1 className="mb-4 font-bold text-xl">افزودن دسته بندی جدید</h1>
       <CategoryForm
         category={category}
