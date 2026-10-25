@@ -1,12 +1,9 @@
 import {
-  LuCable,
-  LuCamera,
   LuCreditCard,
   LuHeadphones,
   LuHeadset,
   LuShieldCheck,
   LuSmartphone,
-  LuTablet,
   LuTruck,
   LuWatch,
 } from "react-icons/lu";
@@ -50,14 +47,13 @@ export const heroSlides = [
   },
 ];
 
-// shortcut: icons stand in for product photos, swap for images when assets exist
 export const homeCategories = [
-  { label: "موبایل", href: "/products", icon: LuSmartphone },
-  { label: "تبلت", href: "/products", icon: LuTablet },
-  { label: "هدفون و هندزفری", href: "/products", icon: LuHeadphones },
-  { label: "ساعت هوشمند", href: "/products", icon: LuWatch },
-  { label: "گجت‌های دیجیتال", href: "/products", icon: LuCamera },
-  { label: "لوازم جانبی", href: "/products", icon: LuCable },
+  { label: "موبایل", href: "/products", image: "/category/mobile.png" },
+  { label: "تبلت", href: "/products", image: "/category/tablet.webp" },
+  { label: "هدفون و هندزفری", href: "/products", image: "/category/headphone.png" },
+  { label: "ساعت هوشمند", href: "/products", image: "/category/smart-watch.png" },
+  { label: "گجت‌های دیجیتال", href: "/products", image: "/category/gadgets.png" },
+  { label: "لوازم جانبی", href: "/products", image: "/category/charger.png" },
 ];
 
 export const promos = [
@@ -65,14 +61,14 @@ export const promos = [
     chip: "ساعت‌های هوشمند",
     title: "سبک زندگی هوشمند",
     subtitle: "مدل‌های جدید با امکانات پیشرفته",
-    icon: LuWatch,
+    image: "/category/smart-watch.png",
     dark: true,
   },
   {
     chip: "هدفون و هندزفری",
     title: "صدای شفاف، تجربه بهتر",
     subtitle: "با بهترین برندها و کیفیت عالی",
-    icon: LuHeadphones,
+    image: "/category/headphone.png",
     dark: false,
   },
 ];

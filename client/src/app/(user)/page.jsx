@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { LuArrowLeft, LuChevronLeft } from "react-icons/lu";
 import { getProducts } from "@/services/productService";
@@ -18,14 +19,21 @@ export default async function Home() {
       <Hero />
 
       <section aria-label="دسته‌بندی‌ها">
-        <ul className="grid grid-cols-3 md:grid-cols-6 gap-4">
-          {homeCategories.map(({ label, href, icon: Icon }) => (
+        {/* columns stay at least ~150px wide so the 120px images never overflow */}
+        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {homeCategories.map(({ label, href, image }) => (
             <li key={label}>
               <Link
                 href={href}
-                className="flex flex-col items-center gap-y-4 rounded-xl bg-secondary-100 px-2 py-6 text-sm font-medium text-secondary-900 text-center"
+                className="flex h-full flex-col items-center justify-center gap-y-4 rounded-xl bg-secondary-100 px-3 py-6 text-sm font-medium text-secondary-900 text-center"
               >
-                <Icon aria-hidden className="w-12 h-12 stroke-1" />
+                <Image
+                  src={image}
+                  alt=""
+                  width={120}
+                  height={120}
+                  className="w-[120px] h-[120px] shrink-0 object-contain"
+                />
                 {label}
               </Link>
             </li>
@@ -34,29 +42,29 @@ export default async function Home() {
       </section>
 
       {products.length > 0 && (
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-secondary-900">
-            پرفروش‌ترین محصولات
-          </h2>
-          <Link
-            href="/products?sort=popular"
-            className="flex items-center gap-x-1 text-sm text-secondary-600"
-          >
-            مشاهده همه
-            <LuArrowLeft />
-          </Link>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {products.slice(0, 4).map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-      </section>
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold text-secondary-900">
+              پرفروش‌ترین محصولات
+            </h2>
+            <Link
+              href="/products?sort=popular"
+              className="flex items-center gap-x-1 text-sm text-secondary-600"
+            >
+              مشاهده همه
+              <LuArrowLeft />
+            </Link>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {products.slice(0, 4).map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        </section>
       )}
 
       <section className="grid gap-5 md:grid-cols-2">
-        {promos.map(({ chip, title, subtitle, icon: Icon, dark }) => (
+        {promos.map(({ chip, title, subtitle, image, dark }) => (
           <div
             key={title}
             className={`flex items-center justify-between gap-4 rounded-2xl p-8 ${
@@ -74,7 +82,9 @@ export default async function Home() {
                 {chip}
               </span>
               <h3 className="text-xl font-bold">{title}</h3>
-              <p className={`text-sm ${dark ? "text-white/80" : "text-secondary-600"}`}>
+              <p
+                className={`text-sm ${dark ? "text-white/80" : "text-secondary-600"}`}
+              >
                 {subtitle}
               </p>
               <Link
@@ -85,7 +95,13 @@ export default async function Home() {
                 <LuChevronLeft />
               </Link>
             </div>
-            <Icon aria-hidden className="w-28 h-28 shrink-0 stroke-1 opacity-80" />
+            <Image
+              src={image}
+              alt=""
+              width={160}
+              height={160}
+              className="w-36 h-36 shrink-0 object-contain"
+            />
           </div>
         ))}
       </section>
@@ -110,7 +126,10 @@ export default async function Home() {
       <section aria-label="خدمات فروشگاه">
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 rounded-xl bg-secondary-100 px-4 py-6 lg:divide-x lg:divide-x-reverse divide-secondary-200">
           {services.map(({ title, subtitle, icon: Icon }) => (
-            <li key={title} className="flex items-center justify-center gap-x-3">
+            <li
+              key={title}
+              className="flex items-center justify-center gap-x-3"
+            >
               <Icon aria-hidden className="w-7 h-7 text-secondary-800" />
               <div>
                 <p className="text-sm font-bold text-secondary-900">{title}</p>
