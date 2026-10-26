@@ -13,11 +13,11 @@ import { toPersianNumbers } from "@/utils/toPersianNumber";
 
 // RTL: first item sits on the right, matching docs/design/mobile-navbottom.png
 const items = [
-  { label: "سبد خرید", href: "/cart", icon: LuShoppingCart },
+  { label: "پروفایل", href: "/profile", icon: LuUser },
   { label: "دسته‌بندی‌ها", href: "/categories", icon: LuLayoutGrid },
   { label: "خانه", href: "/", icon: LuHouse },
   { label: "محصولات", href: "/products", icon: LuShoppingBag },
-  { label: "پروفایل", href: "/profile", icon: LuUser },
+  { label: "سبد خرید", href: "/cart", icon: LuShoppingCart },
 ];
 
 function BottomNav() {

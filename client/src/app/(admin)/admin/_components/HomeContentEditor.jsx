@@ -121,9 +121,18 @@ function HomeContentEditor() {
   return (
     <form className="space-y-4" onSubmit={submitHandler}>
       <h2 className="font-bold">محتوای صفحه اصلی فروشگاه</h2>
-      <p className="text-sm text-secondary-500">
-        تغییرات حداکثر یک دقیقه پس از ذخیره در سایت نمایش داده می‌شود.
-      </p>
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm text-secondary-500">
+          تغییرات حداکثر یک دقیقه پس از ذخیره در سایت نمایش داده می‌شود.
+        </p>
+        <div className="w-52 shrink-0">
+          {isPending ? (
+            <Loading width="45" height="15" />
+          ) : (
+            <Button>ذخیره تغییرات صفحه اصلی</Button>
+          )}
+        </div>
+      </div>
       {SECTIONS.map(({ key, title, fields }) => (
         <ListEditor
           key={key}
@@ -160,13 +169,6 @@ function HomeContentEditor() {
           ))}
         </div>
       </details>
-      <div className="max-w-xs">
-        {isPending ? (
-          <Loading width="45" height="15" />
-        ) : (
-          <Button>ذخیره صفحه اصلی</Button>
-        )}
-      </div>
     </form>
   );
 }
