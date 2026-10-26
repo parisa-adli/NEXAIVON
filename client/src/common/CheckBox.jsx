@@ -8,7 +8,7 @@ function CheckBox({name,id,value,onChange,checked,label}) {
         checked={checked}
         value={value}
         onChange={onChange}
-        className="cursor-pointer  rounded-[5px] border-none bg-secondary-100/80 w-4 h-4 checked:text-primary-900"
+        className="cursor-pointer w-4 h-4 accent-brand"
       />
       <label htmlFor={id} className="cursor-pointer">
         {label}
