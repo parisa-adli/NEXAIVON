@@ -18,7 +18,8 @@ function AdminSideBar({ onClose, isOpenDrawer }) {
 
   return (
     <div className="w-[200px] overflow-y-auto p-4 h-screen bg-secondary-50">
-      <ul className="flex flex-col space-y-8 pt-4">
+      {/* icons use primary-900: brand green from theme-store, #869A7E (theme-accent) in dark mode */}
+      <ul className="flex flex-col space-y-8 pt-4 dark:[--color-primary-900:134,154,126]">
         <li className="flex items-center justify-between">
           <div className="flex items-center gap-x-2">
             <span>

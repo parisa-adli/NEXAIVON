@@ -9,7 +9,7 @@ function RadioInput({ id, name, value, onChange, checked, label, disabled }) {
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className="cursor-pointer rounded-full border-none bg-secondary-100/80 w-4 h-4 checked:text-primary-900"
+        className="cursor-pointer w-4 h-4 accent-brand"
       />
       <label htmlFor={id} className="cursor-pointer">
         {label}
