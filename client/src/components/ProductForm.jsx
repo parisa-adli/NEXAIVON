@@ -3,6 +3,7 @@ import { TagsInput } from "react-tag-input-component";
 import Button from "@/common/Button";
 import Loading from "@/common/Loading";
 import TextField from "@/common/TextField";
+import ImageInput from "@/pages/(admin)/admin/_components/ImageInput";
 
 const productsFormData = [
   {
@@ -46,11 +47,6 @@ const productsFormData = [
     label: "موجودی",
     name: "countInStock",
   },
-  {
-    id: 9,
-    label: "لینک عکس محصول",
-    name: "imageLink",
-  },
 ];
 
 function ProductForm({
@@ -77,6 +73,15 @@ function ProductForm({
             multiline={item.multiline}
           />
         ))}
+        <ImageInput
+          id="imageLink"
+          label="عکس محصول"
+          value={productData.imageLink}
+          removable
+          onChange={(url) =>
+            productDataOnChange({ target: { name: "imageLink", value: url } })
+          }
+        />
         <div>
           <label htmlFor="tags" className="mb-2">
             تگ محصولات
