@@ -69,6 +69,11 @@ function UserPage() {
   return (
     <form className="space-y-4 max-w-lg" onSubmit={handleSubmit}>
       <h1 className="font-bold text-lg mb-8 border-b pb-4">مشخصات کاربر</h1>
+      {selectedUser.isMainAdmin && (
+        <p className="text-secondary-500">
+          نقش و وضعیت ادمین اصلی قابل تغییر نیست.
+        </p>
+      )}
       <div className="grid grid-cols-3 gap-x-4">
         <span className="block mb-2 col-span-1">وضعیت کاربر</span>
         <div className="flex items-center gap-x-8 col-span-2">
@@ -78,6 +83,7 @@ function UserPage() {
             name="isBlocked"
             label="فعال"
             value="active"
+            disabled={selectedUser.isMainAdmin}
             onChange={() => setIsBlocked(false)}
           />
           <RadioInput
@@ -86,6 +92,7 @@ function UserPage() {
             name="isBlocked"
             label="غیر فعال"
             value="inactive"
+            disabled={selectedUser.isMainAdmin}
             onChange={() => setIsBlocked(true)}
           />
         </div>
@@ -99,6 +106,7 @@ function UserPage() {
             name="role"
             label="کاربر"
             value="USER"
+            disabled={selectedUser.isMainAdmin}
             onChange={(e) => setRole(e.target.value)}
           />
           <RadioInput
@@ -107,6 +115,7 @@ function UserPage() {
             name="role"
             label="ادمین"
             value="ADMIN"
+            disabled={selectedUser.isMainAdmin}
             onChange={(e) => setRole(e.target.value)}
           />
         </div>

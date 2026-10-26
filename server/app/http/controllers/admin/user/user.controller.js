@@ -67,6 +67,12 @@ class UserController extends Controller {
     // An admin locking themselves out could leave the shop with no admin.
     if (req.user._id.equals(userId))
       throw createError.BadRequest("امکان تغییر وضعیت یا نقش خودتان وجود ندارد");
+    // Blocking would take the main admin's access away just like a demotion.
+    const changesMainAdmin =
+      target.isMainAdmin &&
+      ((data.role && data.role !== target.role) || data.isBlocked === true);
+    if (changesMainAdmin)
+      throw createError.Forbidden("امکان تغییر نقش یا وضعیت ادمین اصلی وجود ندارد");
 
     const user = await UserModel.findByIdAndUpdate(
       userId,

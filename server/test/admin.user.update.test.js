@@ -71,6 +71,23 @@ describe("PATCH /api/admin/user/update/:userId", () => {
     expect((await UserModel.findById(self._id)).isBlocked).toBe(false);
   });
 
+  it("does not let another admin demote or block the main admin", async () => {
+    const admin = await signedInCookie("ADMIN");
+    const main = await UserModel.create({
+      name: "main",
+      phoneNumber: "09120000021",
+      isActive: true,
+      role: "ADMIN",
+      isMainAdmin: true,
+    });
+
+    expect((await update(admin, main._id, { role: "USER" })).status).toBe(403);
+    expect((await update(admin, main._id, { isBlocked: true })).status).toBe(403);
+    const after = await UserModel.findById(main._id);
+    expect(after.role).toBe("ADMIN");
+    expect(after.isBlocked).toBe(false);
+  });
+
   it("is forbidden for non-admins", async () => {
     const cookie = await signedInCookie("USER");
     const user = await createUser();

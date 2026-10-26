@@ -8,6 +8,7 @@ const {
 
 router.post("/get-otp", expressAsyncHandler(UserAuthController.getOtp));
 router.post("/check-otp", expressAsyncHandler(UserAuthController.checkOtp));
+router.post("/demo-login", expressAsyncHandler(UserAuthController.demoLogin));
 router.post(
   "/complete-profile",
   verifyAccessToken,

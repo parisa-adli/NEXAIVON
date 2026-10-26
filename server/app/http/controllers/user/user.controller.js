@@ -18,6 +18,7 @@ const {
   checkOtpSchema,
   completeProfileSchema,
   updateProfileSchema,
+  demoLoginSchema,
 } = require("../../validators/user/user.schema");
 const { PaymentModel } = require("../../../models/payment");
 
@@ -92,6 +93,35 @@ class userAuthController extends Controller {
       statusCode: HttpStatus.OK,
       data: {
         message: WELLCOME_MESSAGE,
+        user,
+      },
+    });
+  }
+  async demoLogin(req, res) {
+    const { role } = await demoLoginSchema.validateAsync(req.body);
+    // One shared account per role. Each login resets it, so another demo
+    // admin's changes (demote, block) never lock the demo out.
+    const user = await UserModel.findOneAndUpdate(
+      { username: `demo-${role.toLowerCase()}` },
+      {
+        $set: {
+          name: role === ROLES.ADMIN ? "ادمین دمو" : "کاربر دمو",
+          role,
+          isActive: true,
+          isVerifiedPhoneNumber: true,
+          isBlocked: false,
+        },
+      },
+      { new: true, upsert: true, projection: { otp: 0 } }
+    );
+
+    await setAccessToken(res, user);
+    await setRefreshToken(res, user);
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: {
+        message: "به حساب دمو خوش آمدید",
         user,
       },
     });

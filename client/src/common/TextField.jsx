@@ -5,6 +5,7 @@ function TextField({
   onChange,
   disabled = "",
   multiline = false,
+  type = "text",
 }) {
   const Input = multiline ? "textarea" : "input";
 
@@ -16,7 +17,7 @@ function TextField({
       <Input
         autoCapitalize="off"
         className="textField__input"
-        type={multiline ? undefined : "text"}
+        type={multiline ? undefined : type}
         rows={multiline ? 5 : undefined}
         name={name}
         id={name}

@@ -298,6 +298,7 @@ const users = dated([
     isVerifiedPhoneNumber: true,
     isActive: true,
     role: "ADMIN",
+    isMainAdmin: true,
   },
   {
     _id: id("402"),

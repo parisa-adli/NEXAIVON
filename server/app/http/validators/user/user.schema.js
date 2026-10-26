@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const createHttpError = require("http-errors");
+const { DEMO_CREDENTIALS, ROLES } = require("../../../../utils/constants");
 
 const getOtpSchema = Joi.object({
   phoneNumber: Joi.string()
@@ -49,7 +50,26 @@ const updateProfileSchema = Joi.object({
     .error(createHttpError.BadRequest("حوزه تخصصی صحیح نمی باشد.")),
 });
 
+const wrongCredentials = createHttpError.Unauthorized(
+  "نام کاربری یا رمز عبور صحیح نمی باشد"
+);
+const demoLoginSchema = Joi.object({
+  username: Joi.string()
+    .valid(DEMO_CREDENTIALS.username)
+    .required()
+    .error(wrongCredentials),
+  password: Joi.string()
+    .valid(DEMO_CREDENTIALS.password)
+    .required()
+    .error(wrongCredentials),
+  role: Joi.string()
+    .valid(ROLES.USER, ROLES.ADMIN)
+    .required()
+    .error(createHttpError.BadRequest("نقش کاربر صحیح نمی باشد")),
+});
+
 module.exports = {
+  demoLoginSchema,
   getOtpSchema,
   completeProfileSchema,
   checkOtpSchema,

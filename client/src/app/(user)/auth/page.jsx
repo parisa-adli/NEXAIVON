@@ -6,15 +6,21 @@ import toast from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import { checkOtp, getOtp } from "@/services/authServices";
 import CheckOTPForm from "./CheckOTPForm";
+import DemoLoginForm from "./DemoLoginForm";
 import { useRouter } from "next/navigation";
 
 const RESEND_TIME = 90;
+const TABS = [
+  { id: "demo", label: "ورود دمو" },
+  { id: "site", label: "ورود به سایت" },
+];
 
 function AuthPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
   const [time, setTime] = useState(RESEND_TIME);
+  const [tab, setTab] = useState("demo");
   const router = useRouter();
 
   const {
@@ -103,7 +109,31 @@ function AuthPage() {
 
   return (
     <div className="flex justify-center">
-      <div className="w-full sm:max-w-sm">{renderSteps()}</div>
+      <div className="w-full sm:max-w-sm">
+        <div role="tablist" className="flex mb-8 border-b border-secondary-200">
+          {TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              id={`tab-${id}`}
+              aria-selected={tab === id}
+              aria-controls="auth-tabpanel"
+              onClick={() => setTab(id)}
+              className={`flex-1 py-3 border-b-2 -mb-px ${
+                tab === id
+                  ? "border-primary-900 text-primary-900 font-bold"
+                  : "border-transparent text-secondary-500"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div role="tabpanel" id="auth-tabpanel" aria-labelledby={`tab-${tab}`}>
+          {tab === "demo" ? <DemoLoginForm /> : renderSteps()}
+        </div>
+      </div>
     </div>
   );
 }
