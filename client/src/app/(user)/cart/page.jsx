@@ -26,14 +26,17 @@ function CartPage() {
     return (
       <div className="container lg:max-w-screen-lg">
         <p className="font-bold mb-4">سبد خرید خالیه!</p>
-        <Link href="/products" className="text-lg font-bold text-primary-900">
+        <Link
+          href="/products"
+          className="theme-accent text-lg font-bold text-primary-900"
+        >
           رفتن به صفحه محصولات
         </Link>
       </div>
     );
 
   return (
-    <div className="grid grid-cols-12 gap-4 px-4 ">
+    <div className="theme-store grid grid-cols-12 gap-4 px-4 ">
       <div className="col-span-12 lg:col-span-9 space-y-5">
         {cart &&
           cart.productDetail.map((item) => (

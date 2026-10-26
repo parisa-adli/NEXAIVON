@@ -69,6 +69,16 @@ module.exports = {
       container: {
         center: true,
       },
+      keyframes: {
+        "receipt-feed": {
+          from: { transform: "translateY(-100%)" },
+          to: { transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        // steps() makes the paper advance line by line, like a thermal printer
+        "receipt-feed": "receipt-feed 1.75s steps(20) both",
+      },
       boxShadow: {
         "input-focus": "0 12px 24px -8px rgb(var(--color-primary-300))",
       },
