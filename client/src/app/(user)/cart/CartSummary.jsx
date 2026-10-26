@@ -55,7 +55,8 @@ function CartSummary({ payDetail }) {
   };
 
   return (
-    <div>
+    // isolate: keep the z-10 layers below inside this card, under the sticky header
+    <div className="isolate">
       {/* printer body with the paper slot along its bottom edge */}
       <div className="relative z-10 rounded-2xl bg-promo-dark px-4 pt-3 pb-5 shadow-lg ring-1 ring-inset ring-white/10">
         <p className="flex items-center gap-x-2 text-sm font-bold text-brand-tint">
