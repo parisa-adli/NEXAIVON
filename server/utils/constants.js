@@ -7,7 +7,8 @@ module.exports = {
   UPLOADS_URL_PATH: "/uploads",
   // Admin image uploads are capped at this size (FR-API-17).
   MAX_IMAGE_MB: 2,
-  MongoIDPattern: /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i,
+  // Any 24-digit hex ObjectId, all-digit ones included (seed ids are).
+  MongoIDPattern: /^[a-f\d]{24}$/i,
   // Public demo login; the client pre-fills these (client/src/constants/demo.js).
   DEMO_CREDENTIALS: Object.freeze({ username: "demo", password: "demo1234" }),
   ROLES: Object.freeze({
