@@ -94,7 +94,7 @@ function ProductForm({
             دسته بندی
           </label>
           <Select
-            className="bg-secondary-100"
+            classNamePrefix="react-select"
             instanceId="category"
             onChange={setSelectedCategory}
             options={categories}

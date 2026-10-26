@@ -138,3 +138,54 @@ body {
   user-select: none;
   background-color: var(--background-app-rgb);
 }
+
+/* Library inputs follow the theme tokens, so they switch with dark mode.
+   :root raises specificity above the styles the libraries inject at runtime. */
+:root .rti--container {
+  --rti-bg: rgb(var(--color-secondary-100));
+  --rti-border: rgb(var(--color-secondary-100));
+  --rti-main: rgb(var(--color-primary-500));
+  --rti-radius: 0.75rem;
+  --rti-tag: rgb(var(--color-secondary-200));
+  color: rgb(var(--color-secondary-900));
+}
+:root .rti--input {
+  background: transparent;
+  color: rgb(var(--color-secondary-900));
+}
+:root .react-select__control {
+  background-color: rgb(var(--color-secondary-100));
+  border-color: rgb(var(--color-secondary-100));
+  border-radius: 0.75rem;
+  min-height: 3rem;
+}
+:root .react-select__control--is-focused {
+  border-color: rgb(var(--color-primary-500));
+  box-shadow: none;
+}
+:root .react-select__menu {
+  background-color: rgb(var(--color-secondary-0));
+}
+:root .react-select__option--is-focused {
+  background-color: rgb(var(--color-secondary-100));
+}
+:root .react-select__option--is-selected {
+  background-color: rgb(var(--color-primary-900));
+  color: #fff;
+}
+:root .react-select__single-value,
+:root .react-select__input-container,
+:root .react-select__multi-value__label {
+  color: rgb(var(--color-secondary-900));
+}
+:root .react-select__multi-value {
+  background-color: rgb(var(--color-secondary-200));
+}
+:root .react-select__indicator-separator {
+  background-color: rgb(var(--color-secondary-200));
+}
+/* Browser autofill paints its own light background over the input. */
+:root .textField__input:-webkit-autofill {
+  -webkit-text-fill-color: rgb(var(--color-secondary-900));
+  box-shadow: 0 0 0 1000px rgb(var(--color-secondary-100)) inset;
+}

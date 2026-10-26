@@ -60,6 +60,7 @@ function CategoryForm({
             نوع
           </label>
           <Select
+            classNamePrefix="react-select"
             instanceId="type"
             onChange={setSelectedType}
             options={categoryTypes}

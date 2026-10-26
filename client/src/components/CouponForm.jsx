@@ -66,6 +66,7 @@ function CouponForm({
           شامل محصولات
         </label>
         <Select
+          classNamePrefix="react-select"
           isMulti
           instanceId="products"
           onChange={onChangeSelect}
