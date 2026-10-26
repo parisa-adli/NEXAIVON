@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { LuArrowLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import { heroSlides } from "@/constants/home";
+import Image from "next/image";
+import { lineIcons } from "@/constants/homeIcons";
 
-function Hero() {
+function Hero({ heroSlides }) {
   const [index, setIndex] = useState(0);
   const slide = heroSlides[index];
-  const Icon = slide.icon;
+  const Icon = lineIcons[slide.icon];
   const go = (step) =>
     setIndex((i) => (i + step + heroSlides.length) % heroSlides.length);
 
@@ -31,10 +32,23 @@ function Hero() {
             <LuArrowLeft />
           </Link>
         </div>
-        <Icon
-          aria-hidden
-          className="hidden md:block justify-self-center w-56 h-56 text-secondary-700 stroke-1"
-        />
+        {slide.image ? (
+          <Image
+            src={slide.image}
+            alt=""
+            width={320}
+            height={320}
+            priority
+            className="hidden md:block justify-self-center w-72 h-72 object-contain"
+          />
+        ) : (
+          Icon && (
+            <Icon
+              aria-hidden
+              className="hidden md:block justify-self-center w-56 h-56 text-secondary-700 stroke-1"
+            />
+          )
+        )}
       </div>
       <div className="absolute bottom-6 left-8 flex items-center gap-x-3">
         <button type="button" aria-label="اسلاید قبلی" onClick={() => go(-1)}>
@@ -46,7 +60,7 @@ function Hero() {
         <div className="flex gap-x-1.5 mr-2">
           {heroSlides.map((s, i) => (
             <button
-              key={s.title}
+              key={i}
               type="button"
               aria-label={`اسلاید ${i + 1}`}
               aria-current={i === index}

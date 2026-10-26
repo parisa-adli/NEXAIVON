@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/common/Logo";
-import { contact, footerColumns } from "@/constants/home";
+import { getCachedHomeContent } from "@/services/homeContentCache";
 import {
   LuChevronUp,
   LuInstagram,
@@ -19,7 +19,13 @@ const socials = [
   { label: "YouTube", icon: LuYoutube },
 ];
 
-function Footer() {
+async function Footer() {
+  const { contact, footerLinks, navLinks } = await getCachedHomeContent();
+  const footerColumns = [
+    { title: "خدمات مشتریان", links: footerLinks },
+    { title: "دسترسی سریع", links: navLinks },
+  ];
+
   return (
     <footer className="bg-footer text-gray-300 mt-16 px-4">
       <div className="container xl:max-w-screen-xl grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4 text-sm">

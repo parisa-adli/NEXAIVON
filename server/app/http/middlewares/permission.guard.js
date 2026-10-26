@@ -15,6 +15,13 @@ function authorize(...allowedRoles) {
   };
 }
 
+// Runs after authorize(ROLES.ADMIN); req.user is freshly loaded per request.
+function requireMainAdmin(req, res, next) {
+  if (req.user.isMainAdmin) return next();
+  next(createError.Forbidden("فقط ادمین اصلی به این قسمت دسترسی دارد"));
+}
+
 module.exports = {
   authorize,
+  requireMainAdmin,
 };

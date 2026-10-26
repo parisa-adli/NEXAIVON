@@ -1,20 +1,6 @@
-import {
-  LuCreditCard,
-  LuHeadphones,
-  LuHeadset,
-  LuShieldCheck,
-  LuSmartphone,
-  LuTruck,
-  LuWatch,
-} from "react-icons/lu";
-import {
-  SiApple,
-  SiHuawei,
-  SiJbl,
-  SiSamsung,
-  SiSony,
-  SiXiaomi,
-} from "react-icons/si";
+// Default homepage content. Once the main admin saves the homepage from the
+// admin dashboard, each saved section replaces its default here (GET /home).
+// Icons are names from constants/homeIcons.js, so the content can be stored.
 
 // category values are Category.englishTitle, the key the products filter reads
 export const navLinks = [
@@ -42,19 +28,22 @@ export const heroSlides = [
     eyebrow: "تکنولوژی، همراه زندگی شما",
     title: "جدیدترین گوشی‌های هوشمند",
     subtitle: "با بهترین برندها، جدیدترین مدل‌ها و گارانتی معتبر",
-    icon: LuSmartphone,
+    icon: "LuSmartphone",
+    image: "",
   },
   {
     eyebrow: "همیشه در جریان",
     title: "ساعت‌های هوشمند",
     subtitle: "سلامتی و اعلان‌ها، همیشه روی مچ دست شما",
-    icon: LuWatch,
+    icon: "LuWatch",
+    image: "",
   },
   {
     eyebrow: "صدای خالص",
     title: "هدفون و هندزفری بی‌سیم",
     subtitle: "حذف نویز و کیفیت صدای عالی از برندهای معتبر",
-    icon: LuHeadphones,
+    icon: "LuHeadphones",
+    image: "",
   },
 ];
 
@@ -85,40 +74,47 @@ export const promos = [
 ];
 
 export const brands = [
-  { name: "Apple", icon: SiApple },
+  { name: "Apple", icon: "SiApple", wide: false },
   // wide: wordmark glyphs that render thin in a square icon box
-  { name: "Samsung", icon: SiSamsung, wide: true },
-  { name: "Xiaomi", icon: SiXiaomi },
-  { name: "Sony", icon: SiSony, wide: true },
-  { name: "JBL", icon: SiJbl },
-  { name: "Huawei", icon: SiHuawei },
+  { name: "Samsung", icon: "SiSamsung", wide: true },
+  { name: "Xiaomi", icon: "SiXiaomi", wide: false },
+  { name: "Sony", icon: "SiSony", wide: true },
+  { name: "JBL", icon: "SiJbl", wide: false },
+  { name: "Huawei", icon: "SiHuawei", wide: false },
   // no Anker glyph in react-icons, rendered as a wordmark
-  { name: "ANKER" },
+  { name: "ANKER", icon: "", wide: false },
 ];
 
 export const services = [
-  { title: "ارسال سریع", subtitle: "به سراسر کشور", icon: LuTruck },
-  { title: "ضمانت اصالت کالا", subtitle: "با گارانتی معتبر", icon: LuShieldCheck },
-  { title: "پرداخت امن", subtitle: "با درگاه‌های مطمئن", icon: LuCreditCard },
-  { title: "پشتیبانی ۲۴/۷", subtitle: "در تمام مراحل خرید", icon: LuHeadset },
+  { title: "ارسال سریع", subtitle: "به سراسر کشور", icon: "LuTruck" },
+  { title: "ضمانت اصالت کالا", subtitle: "با گارانتی معتبر", icon: "LuShieldCheck" },
+  { title: "پرداخت امن", subtitle: "با درگاه‌های مطمئن", icon: "LuCreditCard" },
+  { title: "پشتیبانی ۲۴/۷", subtitle: "در تمام مراحل خرید", icon: "LuHeadset" },
 ];
 
-export const footerColumns = [
-  {
-    title: "خدمات مشتریان",
-    links: [
-      { label: "پیگیری سفارش", href: "/profile" },
-      { label: "راهنمای خرید", href: "#" },
-      { label: "سوالات متداول", href: "#" },
-      { label: "شرایط و ضوابط", href: "#" },
-      { label: "حریم خصوصی", href: "#" },
-    ],
-  },
-  { title: "دسترسی سریع", links: navLinks },
+// the "خدمات مشتریان" footer column; the quick-access column repeats navLinks
+export const footerLinks = [
+  { label: "پیگیری سفارش", href: "/profile" },
+  { label: "راهنمای خرید", href: "#" },
+  { label: "سوالات متداول", href: "#" },
+  { label: "شرایط و ضوابط", href: "#" },
+  { label: "حریم خصوصی", href: "#" },
 ];
 
 export const contact = {
   phone: "۰۲۱-۱۲۳۴۵۶۷۸",
   email: "info@nexaivon.com",
   address: "تهران، خیابان ولیعصر، پلاک ۱۲۳",
+};
+
+export const homeContentDefaults = {
+  navLinks,
+  searchTags,
+  heroSlides,
+  homeCategories,
+  promos,
+  brands,
+  services,
+  footerLinks,
+  contact,
 };

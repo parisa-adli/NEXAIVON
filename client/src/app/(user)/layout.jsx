@@ -5,13 +5,15 @@ import { Toaster } from "react-hot-toast";
 import Header from "../Header";
 import Footer from "../Footer";
 import BottomNav from "../BottomNav";
+import { getCachedHomeContent } from "@/services/homeContentCache";
 
 export const metadata = {
   title: "NEXAIVON",
   description: "NEXAIVON پنل مدیریت ادمین",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const { navLinks, searchTags } = await getCachedHomeContent();
   return (
     <html lang="fa" dir="rtl">
       <body
@@ -20,7 +22,7 @@ export default function RootLayout({ children }) {
       >
         <Providers>
           <Toaster />
-          <Header />
+          <Header navLinks={navLinks} searchTags={searchTags} />
           <div className="container xl:max-w-screen-xl">{children}</div>
           <Footer />
           <BottomNav />

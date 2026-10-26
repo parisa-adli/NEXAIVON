@@ -6,12 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import DropDown from "@/common/DropDown";
 import Logo from "@/common/Logo";
-import { navLinks, searchTags } from "@/constants/home";
 import { toPersianNumbers } from "@/utils/toPersianNumber";
 import { LuSearch, LuShoppingCart, LuUser, LuX } from "react-icons/lu";
 import Icon from "react-multi-date-picker/components/icon";
 
-function Header() {
+function Header({ navLinks, searchTags }) {
   const { data, isLoading } = useGetUser();
   const { user, cart } = data || {};
   const [isOpen, setIsOpen] = useState(false);
