@@ -2,19 +2,28 @@
 
 import Loading from "@/common/Loading";
 import { useGetUser } from "@/hooks/useAuth";
-import { useAddToCart } from "@/hooks/useCart";
+import { useAddToCart, useDecrementFromCart } from "@/hooks/useCart";
+import { toPersianNumbers } from "@/utils/toPersianNumber";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { LuCheck, LuShoppingCart } from "react-icons/lu";
+import {
+  LuCheck,
+  LuMinus,
+  LuPlus,
+  LuShoppingCart,
+  LuTrash2,
+} from "react-icons/lu";
 
 function AddToCart({ product, compact = false }) {
   const queryClient = useQueryClient();
 
   const router = useRouter();
   const { isPending, mutateAsync } = useAddToCart();
+  const { isPending: isDecrementing, mutateAsync: decrementFromCart } =
+    useDecrementFromCart();
   const { data } = useGetUser();
   const { user } = data || {};
 
@@ -26,8 +35,12 @@ function AddToCart({ product, compact = false }) {
       router.push("/auth");
       return;
     }
+    await updateCart(mutateAsync);
+  };
+
+  const updateCart = async (mutate) => {
     try {
-      const { message } = await mutateAsync(product._id);
+      const { message } = await mutate(product._id);
       toast.success(message);
       queryClient.invalidateQueries({ queryKey: ["get-user"] });
     } catch (error) {
@@ -41,6 +54,10 @@ function AddToCart({ product, compact = false }) {
     if (!user) return false;
     return user.cart?.products.some((p) => p.productId === product._id);
   };
+
+  const quantity =
+    user?.cart?.products.find((p) => p.productId === product._id)?.quantity ||
+    0;
 
   if (compact) {
     const iconClass =
@@ -65,24 +82,57 @@ function AddToCart({ product, compact = false }) {
   return (
     <div>
       {isInCart(user, product) ? (
-        <Link
-          href="/cart"
-          className="flex items-center justify-center bg-secondary-50 text-primary-700 font-bold btn btn--primary border border-primary-900 w-full"
-        >
-          <div className="flex items-center gap-x-3">
-            <span>ادامه سفارش</span>
-            <span>
-              <FaArrowLeftLong />
+        <div className="flex items-center gap-x-3">
+          <Link
+            href="/cart"
+            className="btn flex-1 px-4 py-3 flex items-center justify-center rounded-xl bg-brand-tint text-brand border border-brand"
+          >
+            <div className="flex items-center gap-x-3">
+              <span>ادامه سفارش</span>
+              <span>
+                <FaArrowLeftLong />
+              </span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-x-3 rounded-xl border border-secondary-200 px-3 py-2">
+            <button
+              type="button"
+              aria-label="افزایش تعداد"
+              disabled={isPending || isDecrementing}
+              onClick={() => updateCart(mutateAsync)}
+              className="p-1 text-secondary-900 disabled:opacity-50"
+            >
+              <LuPlus className="w-4 h-4" />
+            </button>
+            <span aria-live="polite" className="w-6 text-center font-bold">
+              {toPersianNumbers(quantity)}
             </span>
+            <button
+              type="button"
+              aria-label={quantity > 1 ? "کاهش تعداد" : "حذف از سبد خرید"}
+              disabled={isPending || isDecrementing}
+              onClick={() => updateCart(decrementFromCart)}
+              className="p-1 text-secondary-900 disabled:opacity-50"
+            >
+              {quantity > 1 ? (
+                <LuMinus className="w-4 h-4" />
+              ) : (
+                <LuTrash2 className="w-4 h-4 text-rose-500" />
+              )}
+            </button>
           </div>
-        </Link>
+        </div>
       ) : isPending ? (
         <div className="px-10">
           <Loading justifyContent="flex-start" width="45" height="15" />
         </div>
       ) : (
-        <button onClick={addToCartHandler} className="btn btn--primary w-full">
-          اضافه کردن به سبد خرید
+        <button
+          onClick={addToCartHandler}
+          className="btn w-full px-4 py-3 rounded-xl bg-brand text-white hover:bg-brand/90 flex items-center justify-center gap-x-2"
+        >
+          <LuShoppingCart aria-hidden className="w-5 h-5" />
+          افزودن به سبد خرید
         </button>
       )}
     </div>
