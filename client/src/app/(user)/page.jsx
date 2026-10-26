@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { LuArrowLeft, LuChevronLeft } from "react-icons/lu";
 import { getProducts } from "@/services/productService";
-import { brands, promos } from "@/constants/home";
+import { brandIcons } from "@/constants/homeIcons";
+import { getCachedHomeContent } from "@/services/homeContentCache";
 import CategoriesSection from "./_components/CategoriesSection";
 import Hero from "./_components/Hero";
 import ProductCard from "./_components/ProductCard";
@@ -12,13 +13,14 @@ export const revalidate = 60;
 
 export default async function Home() {
   // keep the rest of the homepage up when the API is unreachable
-  const { products } = await getProducts("sort=popular&limit=4").catch(() => ({
-    products: [],
-  }));
+  const [{ products }, { heroSlides, promos, brands }] = await Promise.all([
+    getProducts("sort=popular&limit=4").catch(() => ({ products: [] })),
+    getCachedHomeContent(),
+  ]);
 
   return (
     <div className="flex flex-col gap-y-12 px-4">
-      <Hero />
+      <Hero heroSlides={heroSlides} />
       <CategoriesSection />
 
       {products.length > 0 && (
@@ -44,9 +46,9 @@ export default async function Home() {
       )}
 
       <section className="grid gap-5 md:grid-cols-2">
-        {promos.map(({ chip, title, subtitle, image, dark }) => (
+        {promos.map(({ chip, title, subtitle, image, dark }, i) => (
           <div
-            key={title}
+            key={i}
             className={`flex min-w-0 items-center justify-between gap-4 rounded-2xl p-5 sm:p-8 ${
               dark
                 ? "bg-promo-dark text-white"
@@ -76,13 +78,15 @@ export default async function Home() {
                 <LuChevronLeft />
               </Link>
             </div>
-            <Image
-              src={image}
-              alt=""
-              width={160}
-              height={160}
-              className="w-24 h-24 sm:w-36 sm:h-36 shrink-0 object-contain"
-            />
+            {image && (
+              <Image
+                src={image}
+                alt=""
+                width={160}
+                height={160}
+                className="w-24 h-24 sm:w-36 sm:h-36 shrink-0 object-contain"
+              />
+            )}
           </div>
         ))}
       </section>
@@ -92,19 +96,22 @@ export default async function Home() {
           <span className="border-b pb-2">برندهای محبوب</span>
         </h2>
         <ul className="flex flex-wrap items-center justify-around gap-6 rounded-xl bg-secondary-100 px-6 py-6 text-secondary-600">
-          {brands.map(({ name, icon: Icon, wide }) => (
-            <li key={name} title={name}>
-              {Icon ? (
-                // scale enlarges the wordmark without changing the row's layout box
-                <Icon
-                  aria-label={name}
-                  className={`w-16 h-8 ${wide ? "scale-[2]" : ""}`}
-                />
-              ) : (
-                <span className="text-xl font-bold tracking-wider">{name}</span>
-              )}
-            </li>
-          ))}
+          {brands.map(({ name, icon, wide }, i) => {
+            const Icon = brandIcons[icon];
+            return (
+              <li key={i} title={name}>
+                {Icon ? (
+                  // scale enlarges the wordmark without changing the row's layout box
+                  <Icon
+                    aria-label={name}
+                    className={`w-16 h-8 ${wide ? "scale-[2]" : ""}`}
+                  />
+                ) : (
+                  <span className="text-xl font-bold tracking-wider">{name}</span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
       <ServicesSection />

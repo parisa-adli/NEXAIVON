@@ -1,6 +1,6 @@
 import CardsWrapper from "@/pages/(admin)/admin/_components/CartWrapper";
 import { Suspense } from "react";
-import LimitedPayments from "./_components/LimitedPayments";
+import DashboardContent from "./_components/DashboardContent";
 import Fallback from "@/common/Fallback";
 
 async function Admin() {
@@ -13,7 +13,7 @@ async function Admin() {
         </Suspense>
       </div>
 
-      <LimitedPayments />
+      <DashboardContent />
     </div>
   );
 }
