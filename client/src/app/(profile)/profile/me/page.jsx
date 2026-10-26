@@ -41,7 +41,8 @@ function MePage() {
     <div className="max-w-sm">
       <h1 className="text-xl font-bold mb-4">اطلاعات کاربری</h1>
       <form onSubmit={submitHandler} className="space-y-8">
-        {Object.keys(includeObj(user, includesKey)).map((key) => {
+        {/* every field, even ones the account lacks (demo accounts start without email or phone) */}
+        {includesKey.map((key) => {
           return (
             <TextField
               label={key}
@@ -51,7 +52,8 @@ function MePage() {
               onChange={(e) =>
                 setFormData({ ...formData, [e.target.name]: e.target.value })
               }
-              disabled={key === "phoneNumber"}
+              // a phone number is set once, then it is the OTP login key
+              disabled={key === "phoneNumber" && !!user.phoneNumber}
             />
           );
         })}

@@ -21,6 +21,9 @@ const {
   demoLoginSchema,
 } = require("../../validators/user/user.schema");
 const { PaymentModel } = require("../../../models/payment");
+// Demo accounts sign in with a password only: a phone number typed into one
+// must never let anyone sign in to it by OTP.
+const OTP_ACCOUNT = { username: { $exists: false } };
 
 class userAuthController extends Controller {
   async getOtp(req, res) {
@@ -44,7 +47,7 @@ class userAuthController extends Controller {
     const { otp: code, phoneNumber } = req.body;
 
     const user = await UserModel.findOne(
-      { phoneNumber },
+      { phoneNumber, ...OTP_ACCOUNT },
       { password: 0, refreshToken: 0, accessToken: 0 }
     );
     // .populate([
@@ -111,6 +114,8 @@ class userAuthController extends Controller {
           isVerifiedPhoneNumber: true,
           isBlocked: false,
         },
+        // The account is shared: never show one visitor's details to the next.
+        $unset: { email: 1, phoneNumber: 1, biography: 1 },
       },
       { new: true, upsert: true, projection: { otp: 0 } }
     );
@@ -142,7 +147,7 @@ class userAuthController extends Controller {
     });
   }
   async checkUserExist(phoneNumber) {
-    const user = await UserModel.findOne({ phoneNumber });
+    const user = await UserModel.findOne({ phoneNumber, ...OTP_ACCOUNT });
     return user;
   }
   async updateUser(phoneNumber, objectData = {}) {
@@ -151,7 +156,7 @@ class userAuthController extends Controller {
         delete objectData[key];
     });
     const updatedResult = await UserModel.updateOne(
-      { phoneNumber },
+      { phoneNumber, ...OTP_ACCOUNT },
       { $set: objectData }
     );
     return !!updatedResult.modifiedCount;
@@ -229,9 +234,19 @@ class userAuthController extends Controller {
     });
   }
   async updateProfile(req, res) {
-    const { _id: userId } = req.user;
+    const { _id: userId, phoneNumber: currentPhone } = req.user;
     await updateProfileSchema.validateAsync(req.body);
     const { name, email, biography, phoneNumber } = req.body;
+
+    // The phone number is the OTP login key, so it is set once (demo accounts
+    // start without one) and never changed.
+    if (currentPhone && phoneNumber && phoneNumber !== currentPhone)
+      throw createError.BadRequest("امکان تغییر شماره موبایل وجود ندارد");
+    const otherUser = { _id: { $ne: userId } };
+    if (await UserModel.exists({ ...otherUser, email }))
+      throw createError.BadRequest("کاربری با این ایمیل قبلا ثبت نام کرده است.");
+    if (phoneNumber && (await UserModel.exists({ ...otherUser, phoneNumber })))
+      throw createError.BadRequest("این شماره موبایل قبلا ثبت شده است.");
 
     const updateResult = await UserModel.updateOne(
       { _id: userId },
