@@ -43,7 +43,7 @@ function CartSummary({ payDetail }) {
         deleteCouponToCart({ couponCode });
         queryClient.invalidateQueries({ queryKey: ["get-user"] });
       }
-      
+
       if (coupons.find((c) => c.code === couponCode)) {
         const data = await addCouponToCart({ couponCode });
         queryClient.invalidateQueries({ queryKey: ["get-user"] });
@@ -55,50 +55,69 @@ function CartSummary({ payDetail }) {
   };
 
   return (
-    <div className="border p-2 pb-4 rounded-xl space-y-4">
-      <p className="font-bold p-2 text-secondary-700 text-center border-b">
-        اطلاعات پرداخت
-      </p>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span>جمع کل</span>
-          <span>{toPersianNumbersWithComma(totalGrossPrice)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-secondary-500">کد تخفیف</span>
-          <div className="flex flex-row-reverse gap-x-2 relative">
-            <TextField
-              name="couponCode"
-              dir="ltr"
-              onChange={(e) => setCouponCode(e.target.value)}
-              className="!w-[120px] "
-            />
-            <button
-              onClick={checkCouponHandle}
-              type="button"
-              className="absolute left-2 top-[18px] text-sm bg-primary-600 border border-primary-900 text-white px-2 py-1 rounded-xl"
-            >
-              تایید
-            </button>
+    <div>
+      {/* printer body with the paper slot along its bottom edge */}
+      <div className="relative z-10 rounded-2xl bg-promo-dark px-4 pt-3 pb-5 shadow-lg ring-1 ring-inset ring-white/10">
+        <p className="flex items-center gap-x-2 text-sm font-bold text-brand-tint">
+          <span className="w-2 h-2 rounded-full bg-badge-best" />
+          اطلاعات پرداخت
+        </p>
+        <div className="absolute inset-x-4 bottom-2 h-1.5 rounded-full bg-black/60 shadow-inner" />
+      </div>
+      <div className="relative -mt-2 mx-3 overflow-hidden">
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-3 bg-gradient-to-b from-black/30 to-transparent" />
+        <div
+          className="motion-safe:animate-receipt-feed bg-secondary-100 text-secondary-700 px-4 pt-6 pb-8 space-y-4 shadow-md"
+          style={{ clipPath: RECEIPT_EDGE }}
+        >
+          <div className="space-y-4 text-sm">
+            <div className="flex items-center justify-between">
+              <span>جمع کل</span>
+              <span>{toPersianNumbersWithComma(totalGrossPrice)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-secondary-500">کد تخفیف</span>
+              <div className="flex flex-row-reverse gap-x-2 relative [&_input]:border-secondary-300">
+                <TextField
+                  name="couponCode"
+                  dir="ltr"
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  className="!w-[120px] "
+                />
+                <button
+                  onClick={checkCouponHandle}
+                  type="button"
+                  className="absolute left-2 top-[18px] text-sm bg-primary-600 border border-primary-900 text-white px-2 py-1 rounded-xl"
+                >
+                  تایید
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-b border-dashed border-secondary-300 pb-4">
+              <span>تخفیف</span>
+              <span>{toPersianNumbersWithComma(totalOffAmount)} -</span>
+            </div>
+            <div className="flex items-center justify-between font-bold text-base text-secondary-900 border-b border-dashed border-secondary-300 pb-4">
+              <span>مبلغ قابل پرداخت</span>
+              <span>{toPersianNumbersWithComma(totalPrice)}</span>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center justify-between border-b border-dashed pb-4">
-          <span>تخفیف</span>
-          <span>{toPersianNumbersWithComma(totalOffAmount)} -</span>
-        </div>
-        <div className="flex items-center justify-between font-bold">
-          <span>مبلغ قابل پرداخت</span>
-          <span>{toPersianNumbersWithComma(totalPrice)}</span>
+          {isPending ? (
+            <div className="flex justify-center">
+              <Loading width="45" height="15" />
+            </div>
+          ) : (
+            <Button onClick={createPaymentHandler}>ثبت سفارش</Button>
+          )}
         </div>
       </div>
-      {isPending ? (
-        <div className="flex justify-center">
-          <Loading width="45" height="15" />
-        </div>
-      ) : (
-        <Button onClick={createPaymentHandler}>ثبت سفارش</Button>
-      )}
     </div>
   );
 }
+
+// jagged tear-off bottom edge: 20 teeth, 6px deep
+const RECEIPT_EDGE = `polygon(0 0, 100% 0, ${Array.from(
+  { length: 41 },
+  (_, i) => `${100 - i * 2.5}% calc(100% - ${i % 2 ? 0 : 6}px)`,
+).join(", ")})`;
 export default CartSummary;

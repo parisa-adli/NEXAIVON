@@ -6,6 +6,7 @@ import {
   toPersianNumbersWithComma,
 } from "@/utils/toPersianNumber";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { HiMinus, HiOutlineTrash, HiPlus } from "react-icons/hi2";
@@ -42,9 +43,23 @@ function CartItem({ cartItem }) {
   };
 
   return (
-    <div className="border rounded-xl p-4 flex flex-col gap-y-2 md:flex-row md:justify-between ">
-      <Link href={`/products/${cartItem.slug}`}>
-        <span className="md:flex-1 font-bold">{cartItem.title}</span>
+    <div className="border border-secondary-200 bg-secondary-0 rounded-xl p-4 flex flex-col gap-y-2 md:flex-row md:justify-between ">
+      <Link
+        href={`/products/${cartItem.slug}`}
+        className="flex items-center gap-x-3 md:flex-1"
+      >
+        <span className="relative w-16 h-16 shrink-0 rounded-lg bg-secondary-100 overflow-hidden">
+          {cartItem.imageLink && (
+            <Image
+              src={cartItem.imageLink}
+              alt={cartItem.title}
+              fill
+              sizes="64px"
+              className="object-contain p-1"
+            />
+          )}
+        </span>
+        <span className="font-bold text-secondary-900">{cartItem.title}</span>
       </Link>
       <div className="grid grid-cols-1 gap-y-2 md:flex items-center justify-between md:gap-x-8">
         <div className="md:border-l-2 pl-4">
@@ -63,7 +78,7 @@ function CartItem({ cartItem }) {
               <p className="font-bold">
                 {toPersianNumbersWithComma(cartItem.offPrice)}
               </p>
-              <div className="bg-rose-500 px-2 py-0.5 rounded-xl text-white text-sm">
+              <div className="bg-badge-off px-2 py-0.5 rounded-xl text-white text-sm">
                 {toPersianNumbers(cartItem.discount)} %
               </div>
             </div>
@@ -78,7 +93,10 @@ function CartItem({ cartItem }) {
             >
               <HiPlus className="w-4 h-4" />
             </button>
-            <button onClick={decrementHandler} className="border rounded p-1">
+            <button
+              onClick={decrementHandler}
+              className="border border-secondary-300 rounded p-1"
+            >
               {cartItem.quantity > 1 ? (
                 <HiMinus className="w-4 h-4" />
               ) : (
