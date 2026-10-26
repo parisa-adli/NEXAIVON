@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema(
     isBlocked: { type: Boolean, default: false },
     Products: [{ type: ObjectId, ref: "Product" }],
     role: { type: String, default: "USER" },
+    // No other admin can change this user's role or block them.
+    isMainAdmin: { type: Boolean, default: false },
+    // Set only on the demo accounts, which sign in with username and password.
+    username: { type: String, trim: true },
     cart: { type: CartSchema },
     likedProducts: [{ type: ObjectId, ref: "Product" }],
   },

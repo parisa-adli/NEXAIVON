@@ -8,6 +8,8 @@ module.exports = {
   // Admin image uploads are capped at this size (FR-API-17).
   MAX_IMAGE_MB: 2,
   MongoIDPattern: /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i,
+  // Public demo login; the client pre-fills these (client/src/constants/demo.js).
+  DEMO_CREDENTIALS: Object.freeze({ username: "demo", password: "demo1234" }),
   ROLES: Object.freeze({
     USER: "USER",
     ADMIN: "ADMIN",
