@@ -15,7 +15,10 @@ function CartPage() {
     return (
       <div className="container lg:max-w-screen-lg">
         <p className="font-bold mb-4">برای مشاهده سبد خرید لطفا لاگین کنید</p>
-        <Link href="/auth" className="text-lg font-bold text-primary-900">
+        <Link
+          href="/auth"
+          className="theme-store text-lg font-bold text-primary-900 dark:[--color-primary-900:134,154,126]"
+        >
           رفتن به صفحه لاگین؟
         </Link>
       </div>
