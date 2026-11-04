@@ -108,7 +108,8 @@ function AuthPage() {
   };
 
   return (
-    <div className="flex justify-center">
+    // same green ramp as the panels; lighter #869A7E in dark mode (see AdminSideBar)
+    <div className="theme-store flex justify-center dark:[--color-primary-900:134,154,126]">
       <div className="w-full sm:max-w-sm">
         <div role="tablist" className="flex mb-8 border-b border-secondary-200">
           {TABS.map(({ id, label }) => (

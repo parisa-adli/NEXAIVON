@@ -26,7 +26,7 @@ function CheckOTPForm({
 
       {otpResponse && (
         <div className="flex items-center gap-x-1 mb-2">
-          <p className="text-sm text-gray-700">{otpResponse.message}</p>
+          <p className="text-sm text-secondary-700">{otpResponse.message}</p>
           <button onClick={onBack}>
             <TbEdit className="text-primary-900" />
           </button>
@@ -35,9 +35,9 @@ function CheckOTPForm({
 
       <div className="mb-4">
         {time > 0 ? (
-          <p className="text-sm text-gray-500">{time} ثانیه تا ارسال مجدد کد</p>
+          <p className="text-sm text-secondary-500">{time} ثانیه تا ارسال مجدد کد</p>
         ) : (
-          <button className="text-sm text-gray-500" onClick={onResendOtp}>
+          <button className="text-sm text-secondary-500" onClick={onResendOtp}>
             ارسال مجدد کد؟
           </button>
         )}
