@@ -4,7 +4,7 @@ import Loading from "@/common/Loading";
 import { useGetUser } from "@/hooks/useAuth";
 import PaymentTable from "./PaymentTable";
 
-function page() {
+function PaymentsPage() {
   const { isLoading, data } = useGetUser();
   const { user, payments } = data || {};
 
@@ -17,4 +17,4 @@ function page() {
     </div>
   );
 }
-export default page;
+export default PaymentsPage;
