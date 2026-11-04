@@ -9,7 +9,6 @@ import CartSummary from "./CartSummary";
 function CartPage() {
   const { data, isLoading } = useGetUser();
   const { user, cart } = data || {};
-  console.log("cart", cart);
   if (isLoading) return <Loading />;
 
   if (!user || !cart)
@@ -22,7 +21,7 @@ function CartPage() {
       </div>
     );
 
-  if (!user.cart.products || user.cart.products.length === 0)
+  if (!cart.productDetail?.length)
     return (
       <div className="container lg:max-w-screen-lg">
         <p className="font-bold mb-4">سبد خرید خالیه!</p>
